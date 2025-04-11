@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoGebra 动态正方形与45°角交互展示</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="font-awesome.min.css"> <!-- Assuming Font Awesome is used for icons in header -->
+    <style type="text/css">
+        
+        /* Styles from 半角模型.html */
+        /* 主容器样式 */
+        .container {
+            gap: 1.5rem;
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            font-family: 'Arial', sans-serif;
+            /* box-shadow: 0 0 10px rgba(0,0,0,0.1); */
+            border-radius: 8px;
+            overflow: hidden;
+            /* background-color: #FFFFFF; */
+        }
+
+        /* GeoGebra绘图区域 */
+        .geogebra-section {
+            flex: 0 0 600px;
+            padding: 10px;
+            background-color: #FFFFFF;
+            border-right: 1px solid #ddd;
+        }
+
+        #geogebra-container {
+            width: 700px;
+            height: 500px;
+            background-color: white;
+            border-radius: 12px;
+            /* border: 1px solid #ccc; */
+        }
+
+        /* 控制面板区域 */
+        .control-panel {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 控制面板标题 */
+        .panel-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        /* 控制按钮组 */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.secondary {
+            background-color: #2196F3;
+        }
+
+        button.secondary:hover {
+            background-color: #0b7dda;
+        }
+
+        /* 复选框组 */
+        .checkbox-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-item input {
+            margin-right: 8px;
+        }
+
+        /* 公式显示区域 */
+        .formula-display {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .formula-line {
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 证明步骤面板 */
+        .proof-panel {
+            flex: 1;
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #d0e3ff;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        .proof-step {
+            height: 80px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .proof-step.active {
+            display: block;
+        }
+
+        .proof-navigation {
+            display: flex;
+            gap:0.5rem;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .geogebra-section {
+                flex: 0 0 auto;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+        }
+</style>
+</head>
+<body>
+    <header class="header">
+        <h1><i class="fas fa-shapes"></i> 半角模型交互演示</h1>
+        <p>探索正方形内接点与45°角的关系</p>
+    </header>
+    <main class="">
+        <div class="container">
+            <!-- GeoGebra绘图区域 -->
+            <!-- <section class="geogebra-section card"> -->
+            
+            <div id="geogebra-container"></div>
+        </section>
+
+        <!-- 控制面板 -->
+        <section class="control-panel card" style="">
+            <h2 class="panel-title">控制面板</h2>
+            
+            <!-- 按钮组 -->
+            <div class="button-group">
+                <button id="reset-btn" class="btn">重置图形</button>
+                <button id="animate-btn" class="btn secondary">动画演示</button>
+                <!-- <button id="lock-angle-btn" class="btn">锁定45°角</button> -->
+            </div>
+            
+            <!-- 证明步骤面板 -->
+            <div class="proof-panel">
+                <h3>几何证明步骤</h3>
+                <div id="proof-step-1" class="proof-step active">
+                    1. 初始条件：正方形ABCD，点E在CD上，点F在BC上，且∠EAF=45°
+                </div>
+                <div id="proof-step-2" class="proof-step">
+                    2. 将△ABF绕点A逆时针旋转90°，得到△ADF'
+                </div>
+                <div id="proof-step-3" class="proof-step">
+                    3. 因为旋转不改变长度，所以BF = DF'，AF = AF'
+                </div>
+                <div id="proof-step-4" class="proof-step">
+                    4. 因为∠EAF=45°，且旋转了90°，所以∠F'AE=45°（90°-45°=45°）
+                </div>
+                <div id="proof-step-5" class="proof-step">
+                    5. 因此，△AEF ≅ △AEF'（边角边：AF=AF'，∠EAF=∠EAF'，AE=AE）
+                </div>
+                <div id="proof-step-6" class="proof-step">
+                    6. 所以EF=EF'=ED+DF'=ED+BF
+                </div>
+                
+                <div class="proof-navigation">
+                    <button id="prev-step" class="btn" style="background-color: #4CAF50;">上一步</button>
+                    <button id="next-step" class="btn" style="background-color: #4CAF50;">下一步</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    </main>
+
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <script>
+        // GeoGebra初始化参数
+        var parameters = {
+            "appName": "geometry",
+            "width": 700,
+            "height": 500,
+            "borderColor": "#FFFFFF",
+            "borderRadius": 12,
+            "showToolBar": false,
+            "showAlgebraInput": false,
+            "showMenuBar": false,
+            "allowStyleBar": false,
+            "enable3d": false,
+            // "perspective": "O",
+            "appletOnLoad": function(api) { 
+                window.ggbApp = api; 
+                api.evalCommand('SetPerspective("-A")');
+                api.evalCommand('SetPerspective("-D")');
+                initializeSquare(); 
+            },
+            "language": "zh-CN"
+        };
+
+        // 创建GeoGebra应用
+        var applet = new GGBApplet(parameters, true);
+        window.onload = function() {
+            applet.inject('geogebra-container');
+        };
+
+        // 全局变量
+        let isAngleLocked = true;
+        let currentProofStep = 1;
+        let animationInterval = null;
+        let rotationAnimationInterval = null;
+
+        // 初始化正方形和点
+        function initializeSquare() {
+            // 创建正方形ABCD，中心在原点
+            const size = 4; // 正方形边长
+            const halfSize = size/2;
+            
+            ggbApp.evalCommand(`A = (${-halfSize}, ${halfSize})`);
+            ggbApp.evalCommand(`B = (${halfSize}, ${halfSize})`);
+            ggbApp.evalCommand(`C = (${halfSize}, ${-halfSize})`);
+            ggbApp.evalCommand(`D = (${-halfSize}, ${-halfSize})`);
+            ggbApp.evalCommand('poly1 = Polygon(A, B, C, D)');
+            
+            // 创建点E在CD上，点F在BC上
+            ggbApp.evalCommand('E = Point(Segment(D, C))');
+            ggbApp.evalCommand('F = Point(Segment(B, C))');
+            
+            // 设置初始位置
+            ggbApp.setCoords('E', -1, -halfSize);
+            ggbApp.setCoords('F', halfSize, 1);
+            
+            // 创建线段和角度
+            ggbApp.evalCommand('segDE = Segment(D, E)');
+            ggbApp.evalCommand('segBF = Segment(B, F)');
+            ggbApp.evalCommand('segEF = Segment(E, F)');
+            ggbApp.evalCommand('segAE = Segment(A, E)');
+            ggbApp.evalCommand('segAF = Segment(A, F)');
+            ggbApp.evalCommand('angleEAF = Angle(E, A, F)');
+            
+            // 设置线段样式
+            ggbApp.setColor('segDE', 255, 0, 0);
+            ggbApp.setColor('segBF', 0, 0, 255);
+            ggbApp.setColor('segEF', 0, 150, 0);
+            ggbApp.setLineThickness('segEF', 3);
+            
+            // 创建旋转后的点F'和构造元素（初始隐藏）
+            ggbApp.evalCommand("F' = (0,0)");
+            ggbApp.evalCommand("B' = (0,0)");
+            ggbApp.evalCommand("segAF' = Segment(A, F')");
+            ggbApp.evalCommand("segAB' = Segment(A,B')");
+            ggbApp.evalCommand("segF'B' = Segment(F', B')");
+            ggbApp.evalCommand("segEF' = Segment(E, F')");
+            ggbApp.evalCommand("segDF' = Segment(D, F')");
+            ggbApp.evalCommand("triangleADF' = Polygon(A, D, F')");
+            ggbApp.evalCommand("angleEAF' = Angle(E, A, F')");
+            ggbApp.setColor('angleEAF', 255, 165, 0);
+            
+            // 初始隐藏旋转构造
+            ggbApp.setVisible("F'", false);
+            ggbApp.setVisible("B'", false);
+            ggbApp.setVisible("segAF'", false);
+            ggbApp.setVisible("segAB'", false);
+            ggbApp.setVisible("segF'B'", false);
+            ggbApp.setVisible("segEF'", false);
+            ggbApp.setVisible("segDF'", false);
+            ggbApp.setVisible("triangleADF'", false);
+            ggbApp.setVisible("angleEAF'", false);
+            
+            // 更新显示
+            updateDisplay();
+            adjustFFor45DegreeAngle();
+            
+            // 添加点移动监听器
+            ggbApp.registerObjectUpdateListener('E', updateDisplay);
+            ggbApp.registerObjectUpdateListener('F', updateDisplay);
+            
+            // 初始化UI事件
+            initUIEvents();
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            // 如果角度锁定，调整F点位置保持∠EAF=45°
+            if (isAngleLocked) {
+                adjustFFor45DegreeAngle();
+            }
+            
+            // 更新HTML中的公式显示
+            const de = ggbApp.getValueString('Distance(D, E)');
+            const bf = ggbApp.getValueString('Distance(B, F)');
+            const ef = ggbApp.getValueString('Distance(E, F)');
+            const angle = ggbApp.getValueString('angleEAF');
+            
+            // 验证EF = DE + BF
+            const sum = parseFloat(de) + parseFloat(bf);
+            const efValue = parseFloat(ef);
+            if (Math.abs(sum - efValue) > 0.01) {
+                console.warn(`验证失败: DE + BF = ${sum}, EF = ${efValue}`);
+            }
+        }
+
+        // 调整F点位置以保持∠EAF=45°
+        function adjustFFor45DegreeAngle() {
+            const [ax, ay] = [ggbApp.getXcoord('A'), ggbApp.getYcoord('A')];
+            const [ex, ey] = [ggbApp.getXcoord('E'), ggbApp.getYcoord('E')];
+            const [bx, by] = [ggbApp.getXcoord('B'), ggbApp.getYcoord('B')];
+            const [cx, cy] = [ggbApp.getXcoord('C'), ggbApp.getYcoord('C')];
+            
+            // 计算AE的斜率
+            const aeSlope = (ey - ay) / (ex - ax);
+            
+            // 计算AF的斜率，使得∠EAF=45°
+            const angleRad = Math.atan(aeSlope);
+            const desiredAngleRad = angleRad + Math.PI/4; // 加45度
+            
+            // 计算AF的斜率
+            let afSlope = Math.tan(desiredAngleRad);
+            
+            // 计算F点坐标（在BC边上）
+            // BC边的方程是x=正方形边长/2, y从-边长/2到边长/2
+            const fx = ggbApp.getXcoord('B');
+            const fy = ay + afSlope * (fx - ax);
+            
+            // 确保F点在BC边上
+            const minY = ggbApp.getYcoord('C');
+            const maxY = ggbApp.getYcoord('B');
+            
+            if (fy >= minY && fy <= maxY) {
+                ggbApp.setCoords('F', fx, fy);
+            } else {
+                // 如果在BC边上无解，尝试另一种计算方式
+                const desiredAngleRad2 = angleRad - Math.PI/4;
+                const afSlope2 = Math.tan(desiredAngleRad2);
+                const fy2 = ay + afSlope2 * (fx - ax);
+                
+                if (fy2 >= minY && fy2 <= maxY) {
+                    ggbApp.setCoords('F', fx, fy2);
+                } else {
+                    console.log("无法保持45°角，F点超出边界");
+                }
+            }
+        }
+
+        // 初始化UI事件
+        function initUIEvents() {
+            // 重置按钮
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                const halfSize = 2;
+                ggbApp.setCoords('E', -1, -halfSize);
+                ggbApp.setCoords('F', halfSize, 1);
+                currentProofStep = 1;
+                document.getElementById('next-step').style.backgroundColor = '#4CAF50';
+                document.getElementById('next-step').disabled = false;
+                updateProofSteps();
+                // 隐藏旋转构造
+                ggbApp.setVisible("F'", false);
+                ggbApp.setVisible("B'", false);
+                ggbApp.setVisible("segAF'", false);
+                ggbApp.setVisible("segEF'", false);
+                ggbApp.setVisible("segDF'", false);
+                ggbApp.setVisible("segF'B'", false);
+                ggbApp.setVisible("segAB'", false);
+                ggbApp.setVisible("triangleADF'", false);
+                // ggbApp.setVisible("angleEAF", false);
+                ggbApp.setVisible("angleEAF'", false);
+                
+            });
+            
+            // 动画演示按钮
+            document.getElementById('animate-btn').addEventListener('click', function() {
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                    animationInterval = null;
+                    this.textContent = '动画演示';
+                } else {
+                    this.textContent = '停止动画';
+                    startAnimation();
+                }
+            });
+            
+            // 证明步骤导航
+            document.getElementById('next-step').addEventListener('click', function() {
+                if (currentProofStep < 6) {
+                    document.getElementById('prev-step').style.backgroundColor = '#4CAF50';
+                    document.getElementById('prev-step').disabled = false;
+                    currentProofStep++;
+                    updateProofSteps();
+                }else{
+                    document.getElementById('next-step').style.backgroundColor = 'gray';
+                    document.getElementById('next-step').disabled = true;
+                }
+            });
+            
+            document.getElementById('prev-step').addEventListener('click', function() {
+                if (currentProofStep > 1) {
+                    document.getElementById('next-step').style.backgroundColor = '#4CAF50';
+                    document.getElementById('next-step').disabled = false;
+                    currentProofStep--;
+                    updateProofSteps();
+                }else{
+                    document.getElementById('prev-step').style.backgroundColor = 'gray';
+                    document.getElementById('prev-step').disabled = true;
+                }
+            });
+        }
+
+        // 更新证明步骤显示
+        function updateProofSteps() {
+            // 隐藏所有步骤
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`proof-step-${i}`).classList.remove('active');
+            }
+            
+            // 显示当前步骤
+            document.getElementById(`proof-step-${currentProofStep}`).classList.add('active');
+            
+            // 根据步骤高亮图形元素
+            switch(currentProofStep) {
+                case 1:
+                    // 重置所有高亮
+                    break;
+                case 2:
+                    // 开始旋转动画
+                    startRotateAnimation();
+                    break;
+                case 3:
+                    // 高亮相等的线段
+                    ggbApp.setColor('segBF', 255, 0, 0);
+                    ggbApp.setColor('segDF', 255, 0, 0);
+                    ggbApp.setLineThickness('segBF', 3);
+                    ggbApp.setLineThickness('segDF', 3);
+                    break;
+                case 4:
+                    // 高亮角度
+                    ggbApp.setColor('angleEAF', 255, 165, 0);
+                    ggbApp.setColor("angleEAF'", 255, 165, 0);
+                    break;
+                case 5:
+                    // 高亮全等三角形
+                    ggbApp.setColor('segEF', 0, 100, 255);
+                    ggbApp.setColor('segEF', 0, 100, 255);
+                    break;
+                case 6:
+                    // 高亮最终结论的线段
+                    ggbApp.setColor('segDE', 0, 200, 0);
+                    ggbApp.setColor('segBF', 0, 200, 0);
+                    ggbApp.setColor('segEF', 200, 0, 200);
+                    break;
+            }
+        }
+
+        // 开始动画演示
+        function startAnimation() {
+            let direction = 1; // 1表示向右移动，-1表示向左移动
+            let speed = 0.02;
+            
+            animationInterval = setInterval(function() {
+                const [ex, ey] = [ggbApp.getXcoord('E'), ggbApp.getYcoord('E')];
+                const [dx, dy] = [ggbApp.getXcoord('D'), ggbApp.getYcoord('D')];
+                const [cx, cy] = [ggbApp.getXcoord('C'), ggbApp.getYcoord('C')];
+                
+                let newEx = ex + direction * speed;
+                
+                // 检查边界
+                if (newEx > cx) {
+                    newEx = cx;
+                    direction = -1;
+                } else if (newEx < dx) {
+                    newEx = dx;
+                    direction = 1;
+                }
+                
+                // 更新E点位置
+                ggbApp.setCoords('E', newEx, ey);
+                
+                // 如果角度锁定，F点会自动调整
+                if (isAngleLocked) {
+                    adjustFFor45DegreeAngle();
+                }
+                
+                // 更新F'点位置（如果已创建）
+                if (ggbApp.exists("F'")) {
+                    // 获取F点坐标
+                    const [fx, fy] = [ggbApp.getXcoord('F'), ggbApp.getYcoord('F')];
+                    const [ax, ay] = [ggbApp.getXcoord('A'), ggbApp.getYcoord('A')];
+                    
+                    // 计算F点相对于A点的向量
+                    const dx = fx - ax;
+                    const dy = fy - ay;
+                    
+                    // 旋转90度得到F'点坐标
+                    const rotatedDx = dy; // 逆时针旋转90度
+                    const rotatedDy = -dx;
+                    
+                    // 设置F'点坐标
+                    ggbApp.setCoords("F'", ax + rotatedDx, ay + rotatedDy);
+                }
+                
+            }, 20);
+        }
+        
+        // 开始旋转动画
+        function startRotateAnimation() {
+            // 先显示旋转点F'
+            ggbApp.setVisible("F'", true);
+            ggbApp.setVisible("B'", true);
+            
+            // 获取F点坐标
+            const [fx, fy] = [ggbApp.getXcoord('F'), ggbApp.getYcoord('F')];
+            const [bx, by] = [ggbApp.getXcoord('B'), ggbApp.getYcoord('B')];
+            const [ax, ay] = [ggbApp.getXcoord('A'), ggbApp.getYcoord('A')];
+            
+            // 计算初始角度和半径
+            const dx = fx - ax;
+            const dbx = bx - ax;
+            const dy = fy - ay;
+            const dby = by - ay;
+            const radius = Math.sqrt(dx*dx + dy*dy);
+            const radiusb = Math.sqrt(dbx*dbx + dby*dby);
+            let currentAngle = Math.atan2(dy, dx);
+            let currentAngleb = Math.atan2(dby, dbx);
+            const targetAngle = currentAngle + 3*Math.PI/2; // 逆时针旋转90度
+            const targetAngleb = currentAngleb + 3*Math.PI/2; // 逆时针旋转90度
+            
+            // 设置旋转速度
+            const rotationSpeed = 0.02;
+            
+            // 清除之前的动画
+            if (rotationAnimationInterval) {
+                clearInterval(rotationAnimationInterval);
+            }
+            
+            // 开始旋转动画
+            rotationAnimationInterval = setInterval(function() {
+                // 更新角度
+                currentAngle += rotationSpeed;
+                currentAngleb += rotationSpeed;
+                
+                // 检查是否完成旋转
+                if (currentAngle >= targetAngle) {
+                    currentAngle = targetAngle;
+                    currentAngleb = targetAngleb;
+                    clearInterval(rotationAnimationInterval);
+                    rotationAnimationInterval = null;
+                    ggbApp.setVisible("B'", false);
+                    ggbApp.setVisible("segAB'", false);
+                    ggbApp.setVisible("segF'B'", false);
+                    // 旋转完成后绘制三角形
+                    drawTriangleAfterRotation();
+                }
+                
+                // 计算新坐标
+                const newX = ax + radius * Math.cos(currentAngle);
+                const newY = ay + radius * Math.sin(currentAngle);
+                const newXb = ax + radiusb * Math.cos(currentAngleb);
+                const newYb = ay + radiusb * Math.sin(currentAngleb);
+                
+                // 更新F'点位置
+                ggbApp.setCoords("F'", newX, newY);
+                ggbApp.setCoords("B'", newXb, newYb);
+                ggbApp.setVisible("segAF'", true);
+                ggbApp.setVisible("segAB'", true);
+                ggbApp.setVisible("segF'B'", true);
+            }, 10);
+        }
+
+        // 旋转完成后绘制三角形
+        function drawTriangleAfterRotation() {
+            // 显示所有旋转构造元素
+            // ggbApp.setVisible("segAF'", true);
+            // ggbApp.setVisible("segEF'", true);
+            // ggbApp.setVisible("segDF'", true);
+            // ggbApp.setVisible("triangleADF'", true);
+            ggbApp.setVisible("angleEAF'", true);
+            
+            // 设置样式
+            ggbApp.setColor("segAF'", 150, 0, 150);
+            ggbApp.setColor("segF'B'", 150, 0, 150);
+            ggbApp.setColor("segAB'", 150, 0, 150);
+            ggbApp.setColor("segEF'", 0, 150, 150);
+            ggbApp.setColor("segDF'", 0, 0, 200);
+            ggbApp.setLineThickness("segEF'", 2);
+            ggbApp.setLineStyle("segAF'", 1); // 虚线
+            ggbApp.setLineStyle("segF'B'", 1); // 虚线
+            ggbApp.setLineStyle("segAB'", 1); // 虚线
+            
+            // 设置三角形填充
+            ggbApp.setFilling("triangleADF'", 0.1);
+            ggbApp.setColor("triangleADF'", 150, 0, 150);
+        }
+    </script>
+</body>
+</html>
