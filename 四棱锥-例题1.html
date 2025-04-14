@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>四棱锥P-ABCD动态演示</title>
     <!-- Common Libraries -->
-    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <script src="./deployggb.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Link to common stylesheet -->
@@ -127,7 +127,7 @@
         };
 
         var ggbApp1 = new GGBApplet(parameters, true);
-        
+        ggbApp1.setHTML5Codebase('./HTML5/5.0/web3d/');
         window.addEventListener('load', function() {
             ggbApp1.inject('ggb-element');
             

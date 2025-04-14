@@ -150,7 +150,7 @@
         };
 
         var ggbApp = new GGBApplet(parameters, true);
-
+        ggbApp.setHTML5Codebase('./HTML5/5.0/web3d/');
         window.addEventListener('load', function() {
             ggbApp.inject('ggb-element');
         });

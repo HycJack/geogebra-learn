@@ -217,7 +217,7 @@
     </div>
     </main>
 
-    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <script src="./deployggb.js"></script>
     <script>
         // GeoGebra初始化参数
         var parameters = {
@@ -243,6 +243,7 @@
 
         // 创建GeoGebra应用
         var applet = new GGBApplet(parameters, true);
+        applet.setHTML5Codebase('./HTML5/5.0/web3d/');
         window.onload = function() {
             applet.inject('geogebra-container');
         };
