@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数学函数绘图工具(GeoGebra版)</title>
-    <script src="./deployggb.js"></script>
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -464,7 +464,7 @@
             },
         };
         applet = new GGBApplet(parameters, true);
-        applet.setHTML5Codebase('./HTML5/5.0/web3d/');
+        //applet.setHTML5Codebase('./HTML5/5.0/web3d/');
         window.addEventListener('load', function() {
             applet.inject('ggb-element');
             
