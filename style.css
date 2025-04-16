@@ -223,3 +223,181 @@ input[type="range"]::-webkit-slider-thumb:hover {
         width: auto;
     }
 }
+
+/* Styles extracted from 四边形性质.html */
+/* App container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Main content area */
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+/* GeoGebra container */
+.geogebra-container {
+    width: 800px;
+    height: 600px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* Bottom controls */
+.bottom-controls {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--light-color);
+    border-radius: 4px;
+}
+
+/* Shape selector */
+.shape-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.shape-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--light-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.shape-btn:hover {
+    background: #e6f7ff;
+    border-color: var(--primary-color);
+}
+
+.shape-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Toggle grid */
+.toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.toggle-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    margin-bottom: 5px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--secondary-color);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.toggle-label {
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Property panel */
+.property-panel {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 16px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.shape-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.property-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+}
+
+.property-table tr:nth-child(even) {
+    background-color: var(--light-color);
+}
+
+.property-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.property-table td:first-child {
+    font-weight: bold;
+    width: 40%;
+}
+
+.description-box {
+    background: var(--light-color);
+    padding: 12px;
+    border-radius: 4px;
+    line-height: 1.5;
+}
+
+.section-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: var(--dark-color);
+}

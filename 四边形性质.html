@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四边形性质教学演示工具</title>
+    <!-- Link to common stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS独立封装 */
+        .app-container {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+        
+        /* 绘图区域固定尺寸 */
+        .geogebra-container {
+            width: 800px;
+            height: 600px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* 控制面板样式 */
+        .control-panel {
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 底部控制区 */
+        .bottom-controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        /* 胶囊式按钮组 */
+        .shape-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .shape-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #d9d9d9;
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .shape-btn:hover {
+            background: #e6f7ff;
+            border-color: #1890ff;
+        }
+        
+        .shape-btn.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+        
+        /* 开关矩阵 */
+        .toggle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        .toggle-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #52c41a;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .toggle-label {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        /* 属性面板 */
+        .property-panel {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 16px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        .shape-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #1890ff;
+            color: white;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        
+        .property-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+        
+        .property-table tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+        
+        .property-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .property-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        
+        .description-box {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+        
+        .section-title {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1><i class="fas fa-shapes"></i> 四边形性质教学演示</h1>
+            <p>四边形性质教学演示工具 - 探索四边形基本性质</p>
+        </div>
+            <h1></h1>
+        
+        <div class="main-content">
+            <!-- 绘图区域 -->
+            <div>
+                <div id="geogebra-container" class="geogebra-container"></div>
+                
+                <!-- 底部控制区 -->
+                <div class="bottom-controls">
+                    <h3 class="section-title">四边形类型</h3>
+                    <div class="shape-selector">
+                        <button class="shape-btn active" data-shape="square">正方形</button>
+                        <button class="shape-btn" data-shape="rectangle">长方形</button>
+                        <button class="shape-btn" data-shape="rhombus">菱形</button>
+                        <button class="shape-btn" data-shape="parallelogram">平行四边形</button>
+                        <button class="shape-btn" data-shape="trapezoid">梯形</button>
+                        <button class="shape-btn" data-shape="kite">风筝形</button>
+                        <button class="shape-btn" data-shape="irregular">不规则四边形</button>
+                    </div>
+                    
+                    <h3 class="section-title">显示辅助元素</h3>
+                    <div class="toggle-grid">
+                        <div class="toggle-item">
+                            <label class="toggle-switch">
+                                <input type="checkbox" data-element="diagonals">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">对角线</span>
+                        </div>
+                        <div class="toggle-item">
+                            <label class="toggle-switch">
+                                <input type="checkbox" data-element="angles">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">角度标记</span>
+                        </div>
+                        <div class="toggle-item">
+                            <label class="toggle-switch">
+                                <input type="checkbox" data-element="symmetry">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">对称轴</span>
+                        </div>
+                        <div class="toggle-item">
+                            <label class="toggle-switch">
+                                <input type="checkbox" data-element="parallel">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">平行边</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧属性面板 -->
+            <div class="control-panel">
+                <h2>几何属性</h2>
+                <div class="property-panel">
+                    <div class="shape-badge">正方形</div>
+                    <table class="property-table">
+                        <tr>
+                            <td>平行边组数:</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>直角数量:</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>对角线关系:</td>
+                            <td>相等且垂直平分</td>
+                        </tr>
+                        <tr>
+                            <td>对称轴数量:</td>
+                            <td>4</td>
+                        </tr>
+                    </table>
+                    <div class="description-box">
+                        这是一个正方形，具有两组平行边，四个直角，对角线相等且互相垂直平分，有四条对称轴。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用官方CDN引入GeoGebra -->
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    
+    <script>
+        // GeoGebra应用变量
+
+        let currentAuxElements = {
+            diagonals: null,
+            angles: null,
+            symmetry: null,
+            parallel: null
+        };
+        
+        // 初始化GeoGebra应用
+        document.addEventListener('DOMContentLoaded', function() {
+            const parameters = {
+                "appName": "classic",
+                "width": 800,
+                "height": 500,
+                "showToolBar": false,
+                "showAlgebraInput": false,
+                "showMenuBar": false,
+                "allowStyleBar": false,
+                "enable3d": false,
+                "appletOnLoad": function(api) { 
+                    window.ggbApp = api; 
+                    initializeShape('square'); 
+                    api.evalCommand('SetPerspective("-A")');
+                    api.evalCommand('CenterView((2,2))');
+                },
+                "language": "zh-CN"
+            };
+            
+            const applet = new GGBApplet(parameters, true);
+            applet.inject('geogebra-container');
+        });
+        
+        // 初始化四边形
+        function initializeShape(shapeType) {
+            if (!ggbApp) return;
+            
+            // 清除现有图形和辅助元素
+            ggbApp.reset();
+            currentAuxElements = {
+                diagonals: null,
+                angles: null,
+                symmetry: null,
+                parallel: null
+            };
+            
+            // 根据类型创建四边形
+            switch(shapeType) {
+                case 'square':
+                    // 创建正方形
+                    ggbApp.evalCommand('A = (0, 4)');
+                    ggbApp.evalCommand('B = (4, 4)');
+                    ggbApp.evalCommand('C = (4, 0)');
+                    ggbApp.evalCommand('D = (0, 0)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+                case 'rectangle':
+                    // 创建长方形
+                    ggbApp.evalCommand('A = (0, 5)');
+                    ggbApp.evalCommand('B = (6, 5)');
+                    ggbApp.evalCommand('C = (6, 0)');
+                    ggbApp.evalCommand('D = (0, 0)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+                case 'rhombus':
+                    // 创建菱形
+                    ggbApp.evalCommand('A = (3, 6)');
+                    ggbApp.evalCommand('B = (6, 3)');
+                    ggbApp.evalCommand('C = (3, 0)');
+                    ggbApp.evalCommand('D = (0, 3)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+                case 'parallelogram':
+                    // 创建平行四边形
+                    ggbApp.evalCommand('A = (1, 5)');
+                    ggbApp.evalCommand('B = (6, 5)');
+                    ggbApp.evalCommand('C = (4, 0)');
+                    ggbApp.evalCommand('D = (-1, 0)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+                case 'trapezoid':
+                    // 创建梯形
+                    ggbApp.evalCommand('A = (0, 5)');
+                    ggbApp.evalCommand('B = (5, 5)');
+                    ggbApp.evalCommand('C = (4, 0)');
+                    ggbApp.evalCommand('D = (2, 0)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+                case 'kite':
+                    // 创建风筝形
+                    ggbApp.evalCommand('A = (3, 6)');
+                    ggbApp.evalCommand('B = (6, 3)');
+                    ggbApp.evalCommand('C = (3, 0)');
+                    ggbApp.evalCommand('D = (1, 3)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+                case 'irregular':
+                    // 创建不规则四边形
+                    ggbApp.evalCommand('A = (1, 6)');
+                    ggbApp.evalCommand('B = (6, 6)');
+                    ggbApp.evalCommand('C = (4, 1)');
+                    ggbApp.evalCommand('D = (0, 3)');
+                    ggbApp.evalCommand('quad = Polygon(A, B, C, D)');
+                    break;
+            }
+            
+            // 设置图形样式
+            ggbApp.setColor('quad', 0, 0, 0);
+            ggbApp.setLineStyle('quad', 3);
+            ggbApp.setPointStyle('A', 10);
+            ggbApp.setPointStyle('B', 10);
+            ggbApp.setPointStyle('C', 10);
+            ggbApp.setPointStyle('D', 10);
+            ggbApp.setCaption('A', 'A');
+            ggbApp.setCaption('B', 'B');
+            ggbApp.setCaption('C', 'C');
+            ggbApp.setCaption('D', 'D');
+            
+            // 更新属性面板
+            updatePropertyPanel(shapeType);
+            
+            // 重置开关状态
+            document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+                toggle.checked = false;
+            });
+        }
+        
+        // 创建辅助元素
+        function createAuxElement(type, shapeType) {
+            if (!ggbApp) return null;
+            
+            switch(type) {
+                case 'diagonals':
+                    ggbApp.evalCommand('diag1 = Segment(A, C)');
+                    ggbApp.evalCommand('diag2 = Segment(B, D)');
+                    ggbApp.setColor('diag1', 255, 0, 0);
+                    ggbApp.setColor('diag2', 255, 0, 0);
+                    ggbApp.setLineStyle('diag1', 2);
+                    ggbApp.setLineStyle('diag2', 2);
+                    return ['diag1', 'diag2'];
+                    
+                case 'angles':
+                    ggbApp.evalCommand('angle1 = Angle(A, B, C)');
+                    ggbApp.evalCommand('angle2 = Angle(B, C, D)');
+                    ggbApp.evalCommand('angle3 = Angle(C, D, A)');
+                    ggbApp.evalCommand('angle4 = Angle(D, A, B)');
+                    ggbApp.setColor('angle1', 0, 100, 255);
+                    ggbApp.setColor('angle2', 0, 100, 255);
+                    ggbApp.setColor('angle3', 0, 100, 255);
+                    ggbApp.setColor('angle4', 0, 100, 255);
+                    return ['angle1', 'angle2', 'angle3', 'angle4'];
+                    
+                case 'symmetry':
+                    if (shapeType === 'square') {
+                        ggbApp.evalCommand('sym1 = PerpendicularBisector(A, C)');
+                        ggbApp.evalCommand('sym2 = PerpendicularBisector(B, D)');
+                        // ggbApp.evalCommand('sym3 = Line(A, B)');
+                        // ggbApp.evalCommand('sym4 = Line(A, D)');
+                        ggbApp.setColor('sym1', 0, 150, 0);
+                        ggbApp.setColor('sym2', 0, 150, 0);
+                        ggbApp.setColor('sym3', 0, 150, 0);
+                        ggbApp.setColor('sym4', 0, 150, 0);
+                        ggbApp.setLineStyle('sym1', 1);
+                        ggbApp.setLineStyle('sym2', 1);
+                        ggbApp.setLineStyle('sym3', 1);
+                        ggbApp.setLineStyle('sym4', 1);
+                        return ['sym1', 'sym2', 'sym3', 'sym4'];
+                    } else if (shapeType === 'rectangle') {
+                        ggbApp.evalCommand('sym1 = Line(A, C)');
+                        ggbApp.evalCommand('sym2 = Line(B, D)');
+                        ggbApp.setColor('sym1', 0, 150, 0);
+                        ggbApp.setColor('sym2', 0, 150, 0);
+                        ggbApp.setLineStyle('sym1', 1);
+                        ggbApp.setLineStyle('sym2', 1);
+                        return ['sym1', 'sym2'];
+                    } else if (shapeType === 'rhombus') {
+                        ggbApp.evalCommand('sym1 = Line(A, C)');
+                        ggbApp.evalCommand('sym2 = Line(B, D)');
+                        ggbApp.setColor('sym1', 0, 150, 0);
+                        ggbApp.setColor('sym2', 0, 150, 0);
+                        ggbApp.setLineStyle('sym1', 1);
+                        ggbApp.setLineStyle('sym2', 1);
+                        return ['sym1', 'sym2'];
+                    } else if (shapeType === 'kite') {
+                        ggbApp.evalCommand('sym1 = Line(B, D)');
+                        ggbApp.setColor('sym1', 0, 150, 0);
+                        ggbApp.setLineStyle('sym1', 1);
+                        return ['sym1'];
+                    } else {
+                        return null;
+                    }
+                    
+                case 'parallel':
+                    if (shapeType === 'square' || shapeType === 'rectangle' || 
+                        shapeType === 'rhombus' || shapeType === 'parallelogram') {
+                        ggbApp.evalCommand('parallel1 = Line(A, B)');
+                        ggbApp.evalCommand('parallel2 = Line(C, D)');
+                        ggbApp.evalCommand('parallel3 = Line(A, D)');
+                        ggbApp.evalCommand('parallel4 = Line(B, C)');
+                        ggbApp.setColor('parallel1', 150, 0, 150);
+                        ggbApp.setColor('parallel2', 150, 0, 150);
+                        ggbApp.setColor('parallel3', 150, 0, 150);
+                        ggbApp.setColor('parallel4', 150, 0, 150);
+                        ggbApp.setLineStyle('parallel1', 1);
+                        ggbApp.setLineStyle('parallel2', 1);
+                        ggbApp.setLineStyle('parallel3', 1);
+                        ggbApp.setLineStyle('parallel4', 1);
+                        return ['parallel1', 'parallel2', 'parallel3', 'parallel4'];
+                    } else if (shapeType === 'trapezoid') {
+                        ggbApp.evalCommand('parallel1 = Line(A, B)');
+                        ggbApp.evalCommand('parallel2 = Line(C, D)');
+                        ggbApp.setColor('parallel1', 150, 0, 150);
+                        ggbApp.setColor('parallel2', 150, 0, 150);
+                        ggbApp.setLineStyle('parallel1', 1);
+                        ggbApp.setLineStyle('parallel2', 1);
+                        return ['parallel1', 'parallel2'];
+                    } else {
+                        return null;
+                    }
+            }
+        }
+        
+        // 删除辅助元素
+        function deleteAuxElement(elements) {
+            if (!ggbApp || !elements) return;
+            
+            elements.forEach(element => {
+                ggbApp.deleteObject(element);
+            });
+        }
+        
+        // 更新属性面板
+        function updatePropertyPanel(shapeType) {
+            const shapeNames = {
+                'square': '正方形',
+                'rectangle': '长方形',
+                'rhombus': '菱形',
+                'parallelogram': '平行四边形',
+                'trapezoid': '梯形',
+                'kite': '风筝形',
+                'irregular': '不规则四边形'
+            };
+            
+            const properties = {
+                'square': {
+                    parallelSides: '2',
+                    rightAngles: '4',
+                    diagonals: '相等且垂直平分',
+                    symmetry: '4'
+                },
+                'rectangle': {
+                    parallelSides: '2',
+                    rightAngles: '4',
+                    diagonals: '相等且互相平分',
+                    symmetry: '2'
+                },
+                'rhombus': {
+                    parallelSides: '2',
+                    rightAngles: '0',
+                    diagonals: '垂直平分',
+                    symmetry: '2'
+                },
+                'parallelogram': {
+                    parallelSides: '2',
+                    rightAngles: '0',
+                    diagonals: '互相平分',
+                    symmetry: '0'
+                },
+                'trapezoid': {
+                    parallelSides: '1',
+                    rightAngles: '0',
+                    diagonals: '无特殊关系',
+                    symmetry: '0'
+                },
+                'kite': {
+                    parallelSides: '0',
+                    rightAngles: '0',
+                    diagonals: '一条对角线被另一条垂直平分',
+                    symmetry: '1'
+                },
+                'irregular': {
+                    parallelSides: '0',
+                    rightAngles: '0',
+                    diagonals: '无特殊关系',
+                    symmetry: '0'
+                }
+            };
+            
+            const descriptions = {
+                'square': '这是一个正方形，具有两组平行边，四个直角，对角线相等且互相垂直平分，有四条对称轴。',
+                'rectangle': '这是一个长方形，具有两组平行边，四个直角，对角线相等且互相平分，有两条对称轴。',
+                'rhombus': '这是一个菱形，具有两组平行边，没有直角，对角线互相垂直平分，有两条对称轴。',
+                'parallelogram': '这是一个平行四边形，具有两组平行边，没有直角，对角线互相平分，没有对称性。',
+                'trapezoid': '这是一个梯形，具有一组平行边，没有直角，对角线没有特殊关系，没有对称性。',
+                'kite': '这是一个风筝形，没有平行边，没有直角，一条对角线被另一条垂直平分，有一条对称轴。',
+                'irregular': '这是一个不规则四边形，没有平行边，没有直角，对角线没有特殊关系，没有对称性。'
+            };
+            
+            // 更新UI
+            document.querySelector('.shape-badge').textContent = shapeNames[shapeType];
+            document.querySelector('.property-table tr:nth-child(1) td:nth-child(2)').textContent = properties[shapeType].parallelSides;
+            document.querySelector('.property-table tr:nth-child(2) td:nth-child(2)').textContent = properties[shapeType].rightAngles;
+            document.querySelector('.property-table tr:nth-child(3) td:nth-child(2)').textContent = properties[shapeType].diagonals;
+            document.querySelector('.property-table tr:nth-child(4) td:nth-child(2)').textContent = properties[shapeType].symmetry;
+            document.querySelector('.description-box').textContent = descriptions[shapeType];
+        }
+        
+        // 事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            // 形状选择按钮
+            document.querySelectorAll('.shape-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const shapeType = this.dataset.shape;
+                    initializeShape(shapeType);
+                });
+            });
+            
+            // 辅助元素开关
+            document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const elementType = this.dataset.element;
+                    const activeShape = document.querySelector('.shape-btn.active').dataset.shape;
+                    
+                    if (this.checked) {
+                        // 创建辅助元素
+                        currentAuxElements[elementType] = createAuxElement(elementType, activeShape);
+                    } else {
+                        // 删除辅助元素
+                        deleteAuxElement(currentAuxElements[elementType]);
+                        currentAuxElements[elementType] = null;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
