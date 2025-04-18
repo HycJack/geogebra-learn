@@ -47,17 +47,17 @@
             "scale": 1,
             "disableAutoScale": false,
             "allowUpscale": false,
-            "clickToLoad": true,
+            "clickToLoad": false,
             "appName": "classic",
             "buttonRounding": 0.7,
             "buttonShadows": false,
             "language": "zh-CN",
-            "filename": "./file_loading_demo/myfile.ggb",
+            
             "appletOnLoad": function(api) {
                 ggbApp = api;
             }
         };
-        
+        // "filename": "./file_loading_demo/myfile.ggb",
         // Initialize GeoGebra Applet
         function initGeoGebra() {
             const applet = new GGBApplet(parameters, true);
