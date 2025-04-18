@@ -1,0 +1,128 @@
+.header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.main-content-area {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.ggb-container {
+    flex: 3;
+    height: 85vh;
+}
+
+#ggbApplet {
+    width: 100%;
+    height: 100%;
+}
+
+.fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+.fab {
+    background-color: var(--primary-color);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 24px;
+    line-height: 60px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+.fab:hover {
+    transform: scale(1.1);
+}
+
+.file-list-panel {
+    position: absolute;
+    bottom: 75px;
+    right: 0;
+    width: 250px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+}
+
+.file-list-panel.visible {
+    display: flex;
+}
+
+.file-list-panel h4 {
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1rem;
+    color: var(--dark-color);
+}
+
+.file-list-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.file-list-panel li {
+    padding: 8px 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.file-list-panel li i {
+    width: 1.2em;
+    text-align: center;
+    color: #555;
+}
+.file-list-panel li.parent-dir i {
+    color: var(--secondary-color);
+}
+
+.file-list-panel li:hover {
+    background-color: #f0f0f0;
+}
+
+.file-list-panel .loading {
+    text-align: center;
+    padding: 10px;
+    color: #888;
+}
+
+.upload-btn {
+    margin-left: auto;
+    padding: 8px 15px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+.upload-btn:hover {
+    background-color: var(--dark-secondary-color);
+}
