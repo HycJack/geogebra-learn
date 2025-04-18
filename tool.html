@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>Geogebra 工具</title>
+    
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./renderer.css">
+</head>
+
+<body>
+    <header class="header">
+        <h1>Geogebra 工具</h1>
+        
+    </header>
+
+    <div class="main-content-area">
+        <div class="ggb-container">
+            <div id="ggbApplet"></div>
+        </div>
+    </div>
+
+    <script>
+
+        const parameters = {
+            "id": "ggbApplet",
+            "showMenuBar": true,
+            "showAlgebraInput": true,
+            "showToolBar": true,
+            "customToolBar": "0 | 1 501 5 19 , 67 | 2 15 45 18 , 7 37 | 514 3 9 , 13 44 , 47 | 16 | 551 550 11 ,  20 22 21 23 , 55 56 57 , 12 | 69 | 510 511 , 512 513 | 533 531 , 534 532 , 522 523 , 537 536 , 535 | 521 520 | 36 , 38 49 560 | 571 30 29 570 31 33 | 17 | 540 40 41 42 , 27 28 35 , 6 , 502",
+            "showToolBarHelp": true,
+            "showResetIcon": true,
+            "enableLabelDrags": true,
+            "enableShiftDragZoom": true,
+            "enableRightClick": true,
+            "errorDialogsActive": false,
+            "useBrowserForJS": false,
+            "allowStyleBar": false,
+            "preventFocus": false,
+            "showZoomButtons": true,
+            "capturingThreshold": 3,
+            "showFullscreenButton": true,
+            "scale": 1,
+            "disableAutoScale": false,
+            "allowUpscale": false,
+            "clickToLoad": true,
+            "appName": "classic",
+            "buttonRounding": 0.7,
+            "buttonShadows": false,
+            "language": "zh-CN",
+            "filename": "./file_loading_demo/myfile.ggb",
+            "appletOnLoad": function(api) {
+                ggbApp = api;
+            }
+        };
+        
+        // Initialize GeoGebra Applet
+        function initGeoGebra() {
+            const applet = new GGBApplet(parameters, true);
+            applet.inject('ggbApplet');
+        }
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            initGeoGebra();
+        });
+    </script>
+
+</body>
+</html>
