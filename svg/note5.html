@@ -41,15 +41,6 @@
       <circle cx="122.5" cy="850" r="8" />
     </g>
     
-    <!-- 主标题 -->
-    <text x="400" y="300" font-family="'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="55" font-weight="bold" text-anchor="middle" fill="#333333">Geogebra</text>
-    <text x="400" y="370" font-family="'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="55" font-weight="bold" text-anchor="middle" fill="#333333">基础命令</text>
-    <!-- 副标题 -->
-    <text x="400" y="420" font-family="'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="24" font-weight="500" text-anchor="middle" fill="#666666">从零开始学Geogebra命令</text>
-    
-    <!-- 黄色圆圈强调元素 -->
-    <ellipse cx="400" cy="335" rx="220" ry="120" stroke="#FFD54F" stroke-width="4" fill="none" />
-    
     <!-- 品牌/署名 -->
     <text x="400" y="880" font-family="'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="30" font-weight="600" text-anchor="middle" fill="#FF9800">HycJack</text>
     
@@ -87,13 +78,25 @@
     
     <!-- 命令列表示意 -->
     <g font-family="'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#444444">
-      <text x="200" y="490" font-weight="bold">面积、周长、角度基础命令:</text>
-      <text x="200" y="530" font-weight="bold">面积基础命令: </text>
-      <text x="220" y="560">• 点的连线围成的面积：</text>
-      <text x="240" y="590">    Area((0, 0), (3, 0), (3, 2), (0, 2))</text>
-      <text x="220" y="620">• 圆、椭圆等面积：Area(x^2 + y^2 = 2)</text>
-      <text x="240" y="650">    Area(x^2 + y^2 = 2)</text>
-      <text x="220" y="680">• 多边形面积：</text>
-      <text x="240" y="710">    Area(Polygon((0, 0), (4, 0), (4, 2), (0, 2)))</text>
+      <text x="200" y="220" font-weight="bold">周长基础命令:</text>
+      <text x="200" y="260">• 周长: </text>
+      <text x="220" y="290">    多边形周长：Perimeter(Polygon((1, 2), (3, 2), (4, 3)))</text>
+      <text x="220" y="320">    圆、椭圆等周长：Perimeter(x^2 + 2y^2 = 1)</text>
+      
+      <text x="200" y="370" font-weight="bold">角度基础命令:</text>
+      <text x="200" y="410">• 对象与X轴的角度: </text>
+      <text x="220" y="440">    x 轴与给定点之间的角度：Angle((1, 1))</text>
+      <text x="220" y="470">    x 轴和给定向量之间的角度：Angle(Vector((1, 1)))</text>
+      <text x="220" y="500">    多边形的所有角度（逆时针）：</text>
+      <text x="220" y="530">    Angle(Polygon((4, 1), (2, 4), (1, 1)))</text>
+      
+      <text x="200" y="560">• 两个向量之间的角度: </text>
+      <text x="220" y="590">    Angle(Vector((1, 1)), Vector((2, 5)))</text>
+      <text x="200" y="620">• 两条直线的方向矢量之间的角度: </text>
+      <text x="220" y="650">    Angle(y = x + 2, y = 2x + 3)</text>
+      <text x="200" y="680">• 直线和平面之间的角度: </text>
+      <text x="220" y="710">    Angle(Line((1, 2, 3),(-2, -2, 0)), z = 0)</text>
+      <text x="200" y="740">• 两个给定平面之间的角度: </text>
+      <text x="220" y="770">    Angle(2x - y + z = 0, z = 0)</text>
     </g>
   </svg>
