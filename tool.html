@@ -4,120 +4,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8" />
     <title>Geogebra 工具</title>
+    
     <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./renderer.css">
     <style>
-        :root {
-            --primary-color: #4285f4;
-            --secondary-color: #34a853;
-            --dark-color: #333;
-            --border-color: #ddd;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            position: relative;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            /* padding: 1.5rem 2rem;
-            text-align: center;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 2rem;  */
-        }
-         /* Style for upload button in header */
-         .header .upload-btn {
-            margin-left: auto; /* Pushes button to the right */
-            padding: 8px 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-        .header .upload-btn:hover {
-            background-color: var(--dark-secondary-color); /* Define this color in style.css or use a darker shade */
-        }
-         /* Hide the actual file input */
-        #fileInput {
-            display: none;
-        }
-        
-        .main-content-area {
-            display: flex;
-            height: calc(100vh - 60px);
-            position: relative;
-        }
-        
-        .ggb-container {
-            flex: 1;
-            height: 100%;
-            position: relative;
-        }
-        
-        #ggbApplet {
-            width: 100%;
-            height: 100%;
-        }
-        
-        /* Floating Action Button and Panel */
-        .fab-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-        }
-        
-        .fab {
-            background-color: var(--primary-color);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            font-size: 24px;
-            line-height: 50px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-        
-        .fab:hover {
-            transform: scale(1.1);
-        }
-        
-        .file-list-panel {
-            position: absolute;
-            bottom: 75px;
-            right: 0;
-            width: 250px;
-            max-height: 300px;
-            overflow-y: auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            display: none;
-            flex-direction: column;
-        }
-        
-        .file-list-panel.visible {
-            display: flex;
-        }
-        
         /* Annotation Tool Styles */
         #annotation-toolbar {
             position: fixed;
@@ -276,99 +169,13 @@
             pointer-events: none !important;
         }
         
-        /* Upload button styles */
-        /* .header .upload-btn {
-            margin-left: auto;
-            padding: 8px 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-        
-        .header .upload-btn:hover {
-            background-color: #2d9247;
-        } */
-        
-        #fileInput {
-            display: none;
-        }
-        
-        /* File list panel styles */
-        .file-list-panel h4 {
-            margin: 0 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 1rem;
-            color: var(--dark-color);
-        }
-        
-        .file-list-panel ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        
-        .file-list-panel li {
-            padding: 8px 5px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .file-list-panel li i {
-            width: 1.2em;
-            text-align: center;
-            color: #555;
-        }
-        
-        .file-list-panel li.parent-dir i {
-            color: var(--secondary-color);
-        }
-        
-        .file-list-panel li:hover {
-            background-color: #f0f0f0;
-        }
-        
-        .file-list-panel .loading {
-            text-align: center;
-            padding: 10px;
-            color: #888;
-        }
     </style>
 </head>
 
 <body>
-    <!-- <header class="header">
-        <div>
-            <h1>Geogebra 工具</h1>
-        </div>
-        <button id="uploadButton" class="upload-btn">
-            <i class="fas fa-upload"></i> 上传文件
-        </button>
-        <input type="file" id="fileInput" accept=".ggb" />
-    </header> -->
-    <header class="header" style="height:60px;display: flex; align-items: center;">
-        <div> <!-- Wrap title and description -->
-            <h1>Geogebra 工具</h1>
-            <!-- <p>加载和交互 GeoGebra 文件</p> -->
-        </div>
-        <button id="uploadButton" class="upload-btn">
-             <i class="fas fa-upload"></i> 上传文件
-        </button>
-        <input type="file" id="fileInput" accept=".ggb" /> <!-- Hidden file input -->
+    <header class="header">
+        <h1>Geogebra 工具</h1>
+        
     </header>
 
     <div class="main-content-area">
@@ -376,24 +183,7 @@
             <div id="ggbApplet"></div>
         </div>
     </div>
-
-    <!-- Floating Action Button and Panel -->
-    <div class="fab-container">
-        <div id="fileListPanel" class="file-list-panel">
-            <h4 id="fileListTitle">文件列表</h4>
-            <ul id="fileList">
-                <li class="loading">加载中...</li>
-            </ul>
-        </div>
-        <button id="fab" class="fab">☰</button>
-    </div>
-
-    <!-- Annotation Tool Toggle -->
-    <button id="toggle-annotation" title="标注工具">
-        <i class="fas fa-pen"></i>
-    </button>
-    
-    <!-- Annotation Toolbar -->
+<!-- Annotation Toolbar -->
     <div id="annotation-toolbar">
         <div class="tool-group">
             <button id="anno-cursorBtn" title="选择模式"><i class="fas fa-mouse-pointer"></i></button>
@@ -425,28 +215,19 @@
     
     <canvas id="annotation-canvas" class="hidden"></canvas>
     <div id="annotation-textInput" contenteditable="true"></div>
-
     <script>
-        // GeoGebra Applet Configuration
-        var ggbApp = null;
-        var filePath = '';
-        var currentDirectoryPath = '/';
-        const split_str = window.location.href.split('?');
-        if(split_str.length > 1){
-            filePath = split_str[1].split('=')[1];
-            console.log(filePath);
-        }
-        var parameters = {
-            // "id": "ggbApplet",
+// "customToolBar": "0 | 1 501 5 19 , 67 | 2 15 45 18 , 7 37 | 514 3 9 , 13 44 , 47 | 16 | 551 550 11 ,  20 22 21 23 , 55 56 57 , 12 | 69 | 510 511 , 512 513 | 533 531 , 534 532 , 522 523 , 537 536 , 535 | 521 520 | 36 , 38 49 560 | 571 30 29 570 31 33 | 17 | 540 40 41 42 , 27 28 35 , 6 , 502",
+            
+        const parameters = {
+            "id": "ggbApplet",
             "showMenuBar": true,
             "showAlgebraInput": true,
             "showToolBar": true,
-            //"customToolBar": "0 | 1 501 5 19 , 67 | 2 15 45 18 , 7 37 | 514 3 9 , 13 44 , 47 | 16 | 551 550 11 ,  20 22 21 23 , 55 56 57 , 12 | 69 | 510 511 , 512 513 | 533 531 , 534 532 , 522 523 , 537 536 , 535 | 521 520 | 36 , 38 49 560 | 571 30 29 570 31 33 | 17 | 540 40 41 42 , 27 28 35 , 6 , 502",
             "showToolBarHelp": true,
-            "showResetIcon": false,
-            "enableLabelDrags": false,
+            "showResetIcon": true,
+            "enableLabelDrags": true,
             "enableShiftDragZoom": true,
-            "enableRightClick": false,
+            "enableRightClick": true,
             "errorDialogsActive": false,
             "useBrowserForJS": false,
             "allowStyleBar": false,
@@ -462,238 +243,23 @@
             "buttonRounding": 0.7,
             "buttonShadows": false,
             "language": "zh-CN",
-            "filename": filePath,
-            "scaleContainerClass":"ggb-container",
-            "appletOnLoad": function (api) {
+            
+            "appletOnLoad": function(api) {
                 ggbApp = api;
-                initPrism();
             }
         };
-        var applet = new GGBApplet(parameters, true);
-        applet.setHTML5Codebase('./geogebra/HTML5/5.0/web3d/');
-
-        window.onload = function () {
+        // "filename": "./file_loading_demo/myfile.ggb",
+        // Initialize GeoGebra Applet
+        function initGeoGebra() {
+            const applet = new GGBApplet(parameters, true);
             applet.inject('ggbApplet');
-            initAnnotationTool();
-            // 添加窗口大小变化监听器
-            window.addEventListener('resize', handleResize);
-            // 初始调整大小
-            handleResize();
-            
-        };
-
-        // 处理窗口大小变化
-        function handleResize() {
-            const container = document.querySelector('.ggb-container');
-            const ggbApplet = document.getElementById('ggbApplet');
-            
-            if (ggbApp && ggbApplet) {
-                // 重新设置GeoGebra应用大小
-                ggbApp.setWidth(container.offsetWidth);
-                ggbApp.setHeight(container.offsetHeight);
-                
-                // 强制重绘
-                ggbApp.recalculateEnvironments();
-                // ggbApp.repaint();
-            }
         }
-
-
-        function initPrism() {
-            if (!ggbApp) return;
-        }
-
-        // --- File List Logic ---
-        const fab = document.getElementById('fab');
-        const fileListPanel = document.getElementById('fileListPanel');
-        const fileListUl = document.getElementById('fileList');
-        const fileListTitle = document.getElementById('fileListTitle');
-
-        fab.addEventListener('click', () => {
-            const isVisible = fileListPanel.classList.toggle('visible');
-            if (isVisible) {
-                loadDirectory(currentDirectoryPath);
-            }
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            initGeoGebra();
         });
-
-        // document.addEventListener('click', function(event) {
-        //     if (!fab.contains(event.target) && !fileListPanel.contains(event.target) 
-        //             && fileListPanel.classList.contains('visible')) {
-        //         fileListPanel.classList.remove('visible');
-        //     }
-        // });
-
-        async function loadDirectory(dirPath) {
-            let normalizedDirPath = dirPath.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
-            currentDirectoryPath = normalizedDirPath;
-            fileListTitle.textContent = `文件列表: /${currentDirectoryPath}`;
-            fileListUl.innerHTML = '<li class="loading">加载中...</li>';
-
-            try {
-                const encodedDirPath = encodeURIComponent(normalizedDirPath);
-                const response = await fetch(`/filelist?path=${encodedDirPath}`);
-                if (!response.ok) {
-                    let errorMsg = `Network response was not ok (${response.status})`;
-                    try {
-                        const errorData = await response.json();
-                        if (errorData && errorData.error) {
-                            errorMsg += `: ${errorData.error}`;
-                        }
-                    } catch (e) {}
-                    throw new Error(errorMsg);
-                }
-
-                const data = await response.json();
-                const processedData = data
-                    .map(item => {
-                        if (item.path) {
-                            item.path = item.path.replace(/\\/g, '/');
-                            item.path = item.path.startsWith('/') ? item.path.substring(1) : item.path;
-                        }
-                        return item;
-                    });
-
-                renderFileList(processedData);
-            } catch (error) {
-                console.error('Error loading directory:', error);
-                fileListUl.innerHTML = `<li>加载目录 '${currentDirectoryPath}' 失败</li>`;
-            }
-        }
-
-        function renderFileList(items) {
-            fileListUl.innerHTML = '';
-
-            if (currentDirectoryPath && currentDirectoryPath !== '/' && currentDirectoryPath !== '') {
-                const parentPath = currentDirectoryPath.substring(0, currentDirectoryPath.lastIndexOf('/')) || '/';
-                const li = document.createElement('li');
-                li.classList.add('parent-dir');
-                li.innerHTML = `<i class="fas fa-level-up-alt"></i> .. (上级目录)`;
-                li.addEventListener('click', () => {
-                    currentDirectoryPath = parentPath;
-                    loadDirectory(parentPath);
-                });
-                fileListUl.appendChild(li);
-            }
-
-            if (!items || items.length === 0) {
-                if (fileListUl.children.length === 0) {
-                    fileListUl.innerHTML = '<li>此目录为空</li>';
-                }
-                return;
-            }
-
-            const directories = items.filter(item => item.type === 'directory');
-            const ggbFiles = items.filter(item => item.type === 'file' && item.name.toLowerCase().endsWith('.ggb'));
-
-            directories.sort((a, b) => a.name.localeCompare(b.name));
-            ggbFiles.sort((a, b) => a.name.localeCompare(b.name));
-
-            directories.forEach(dir => {
-                const li = document.createElement('li');
-                li.innerHTML = `<i class="fas fa-folder"></i> ${dir.name}`;
-                li.setAttribute('data-path', dir.path);
-                li.addEventListener('click', () => {
-                    loadDirectory(dir.path);
-                });
-                fileListUl.appendChild(li);
-            });
-
-            ggbFiles.forEach(file => {
-                const li = document.createElement('li');
-                li.innerHTML = `<i class="fas fa-file"></i> ${file.name}`;
-                li.setAttribute('data-filepath', file.path);
-                li.addEventListener('click', () => {
-                    currentDirectoryPath == "" ? loadFile("/file/root/"+file.path):loadFile("/file/"+file.path);
-                    const path_param = currentDirectoryPath == "" ? "/file/root/"+file.path:"/file/"+file.path;
-                    const newUrl = window.location.href.split('?')[0] + "?file=" + path_param; // 这里仅是示例拼接方式
-                    window.location.href = newUrl;
-                    fileListPanel.classList.remove('visible');
-                });
-                fileListUl.appendChild(li);
-            });
-
-            if (fileListUl.children.length === 1 && fileListUl.firstChild.classList.contains('parent-dir') && directories.length === 0 && ggbFiles.length === 0) {
-                const li = document.createElement('li');
-                li.textContent = '此目录没有 .ggb 文件或子目录';
-                li.style.cursor = 'default';
-                li.style.color = '#888';
-                fileListUl.appendChild(li);
-            } else if (fileListUl.children.length === 0) {
-                fileListUl.innerHTML = '<li>没有找到 .ggb 文件或子目录</li>';
-            }
-        }
-
-        function loadFile(filePath) {
-            if (!ggbApp) {
-                console.error("GeoGebra App not initialized yet.");
-                return;
-            }
-            // while(!ggbApp){
-            //     setTimeout(() => {
-            //         console.log("Waiting for GeoGebra App to initialize...");
-            //     }, 1000);
-            // }
-            console.log(`Loading file: ${filePath}`);
-            parameters.filename = filePath;
-            const container = document.getElementById('ggbApplet');
-            container.innerHTML = '';
-            applet = new GGBApplet(parameters, true);
-            applet.setHTML5Codebase('./geogebra/HTML5/5.0/web3d/');
-            applet.inject('ggbApplet');
-            // 初始调整大小
-            handleResize();
-        }
-
-        // --- Upload Logic ---
-        const uploadButton = document.getElementById('uploadButton');
-        const fileInput = document.getElementById('fileInput');
-
-        uploadButton.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (!file.name.toLowerCase().endsWith('.ggb')) {
-                alert('请选择一个 .ggb 文件');
-                fileInput.value = '';
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
-            uploadButton.disabled = true;
-
-            try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(result.error || `上传失败 (${response.status})`);
-                }
-
-                alert(`文件 '${file.name}' 上传成功!`);
-                if (fileListPanel.classList.contains('visible')) {
-                    loadDirectory('upload');
-                }
-                loadFile("upload/"+result.file.filename);
-            } catch (error) {
-                console.error('Upload error:', error);
-                alert(`上传失败: ${error.message}`);
-            } finally {
-                uploadButton.innerHTML = '<i class="fas fa-upload"></i> 上传文件';
-                uploadButton.disabled = false;
-                fileInput.value = '';
-            }
-        });
-    // --- Annotation Tool Code ---
+        // --- Annotation Tool Code ---
     function initAnnotationTool() {
             const container = document.querySelector('.ggb-container');
             const canvas = document.createElement('canvas');
@@ -1032,5 +598,6 @@
             setActiveTool('arrow');
         }
     </script>
+
 </body>
 </html>
