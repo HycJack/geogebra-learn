@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D几何体演示工具</title>
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --dark-color: #202124;
+            --light-color: #f8f9fa;
+            --border-color: #dadce0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="10" height="10" fill="white" fill-opacity="0.1"/></svg>');
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-weight: 400;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            gap: 1.5rem;
+        }
+        
+        .viewer-container {
+            flex: 2;
+            min-width: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .viewer-container:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-panel {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        #ggb-element {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .control-group h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .slider-container label {
+            font-weight: 500;
+            min-width: 80px;
+        }
+        
+        input[type="range"] {
+            flex-grow: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: var(--border-color);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+        
+        .value-display {
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+            background: var(--light-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        select {
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        select:hover {
+            border-color: var(--primary-color);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        button {
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+        button i {
+            font-size: 1.1rem;
+        }
+        
+        button.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        button.primary:hover {
+            background-color: #3367d6;
+            transform: translateY(-2px);
+        }
+        
+        button.secondary {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        button.secondary:hover {
+            background-color: #e8eaed;
+            transform: translateY(-2px);
+        }
+        
+        .shape-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .viewer-container, .control-panel {
+                min-width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .control-group {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        .control-group:nth-child(1) { animation-delay: 0.1s; }
+        .control-group:nth-child(2) { animation-delay: 0.2s; }
+        .control-group:nth-child(3) { animation-delay: 0.3s; }
+        
+        /* 工具提示样式 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .shape-info {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .shape-info h4 {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .shape-info p {
+            font-size: 0.9rem;
+            color: var(--dark-color);
+            opacity: 0.85;
+        }
+        
+        .slider-container.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-top: 1px solid #e8eaed;
+            font-size: 0.85rem;
+            color: #5f6368;
+        }
+        
+        .shape-vertices {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .shape-vertices span {
+            background-color: #e8f0fe;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-shapes"></i> 3D几何体演示工具</h1>
+        <p>交互式3D几何体可视化教学工具 - 拖动滑块实时查看变化</p>
+    </div>
+    
+    <div class="main-container">
+        <div class="viewer-container">
+            <div id="ggb-element"></div>
+            <div class="status-bar">
+                <div id="shapeStats">当前几何体: 三棱柱 | 高度: 3.0 | 半径: 1.0</div>
+                <div class="shape-vertices">
+                    <span>点: 6</span>
+                    <span>边: 9</span>
+                    <span>面: 5</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="control-group">
+                <h3><i class="fas fa-cube"></i> 几何体设置</h3>
+                <label for="shapeSelector">选择几何体:</label>
+                <select id="shapeSelector">
+                    <option value="triangularPrism"><i class="fas fa-gem"></i> 三棱柱</option>
+                    <option value="rectangularPrism"><i class="fas fa-cube"></i> 四棱柱</option>
+                    <option value="cylinder"><i class="fas fa-circle"></i> 圆柱体</option>
+                    <option value="triangularPyramid"><i class="fas fa-mountain"></i> 三棱锥</option>
+                    <option value="pentagonalPyramid"><i class="fas fa-crown"></i> 五棱锥</option>
+                    <option value="pentagonalPrism"><i class="fas fa-gem"></i> 五棱柱</option>
+                    <option value="conicalFrustum"><i class="fas fa-hourglass-half"></i> 圆台</option>
+                </select>
+                
+                <div class="shape-info">
+                    <h4 id="shapeName">三棱柱</h4>
+                    <p id="shapeDescription">具有两个平行且全等的三角形底面和三个矩形侧面的多面体。</p>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3><i class="fas fa-ruler-combined"></i> 尺寸设置</h3>
+                <div class="slider-container">
+                    <label for="heightSlider">高度:</label>
+                    <input type="range" id="heightSlider" min="0.5" max="10" value="3" step="0.1">
+                    <span id="heightValue" class="value-display">3.0</span>
+                </div>
+                
+                <div class="slider-container disabled" id="radiusControl">
+                    <label for="radiusSlider">半径:</label>
+                    <input type="range" id="radiusSlider" min="0.0" max="3" value="1" step="0.1">
+                    <span id="radiusValue" class="value-display">1.0</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3><i class="fas fa-eye"></i> 视图控制</h3>
+                <div class="btn-group">
+                    <button id="resetViewBtn" class="primary">
+                        <i class="fas fa-sync-alt"></i> 重置视图
+                    </button>
+                    <button id="toggleLabelsBtn" class="secondary">
+                        <i class="fas fa-tag"></i> 切换标签
+                    </button>
+                    <button id="wireframeBtn" class="secondary">
+                        <i class="fas fa-network-wired"></i> 线框模式
+                    </button>
+                </div>
+            </div>
+            
+            <div class="control-group" style="display:none">
+                <h3><i class="fas fa-info-circle"></i> 几何体属性</h3>
+                <div class="shape-properties">
+                    <div class="property">
+                        <label>体积:</label>
+                        <span id="volumeValue">7.79</span>
+                    </div>
+                    <div class="property">
+                        <label>表面积:</label>
+                        <span id="surfaceAreaValue">23.12</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+
+        let currentShape = 'triangularPrism';
+        let currentHeight = 3;
+        let currentRadius = 1;
+        let labelsVisible = true;
+        let wireframeMode = false;
+        let oldObjects = [];
+        
+        // 几何体描述信息
+        const shapeInfo = {
+            triangularPrism: {
+                name: "三棱柱",
+                description: "具有两个平行且全等的三角形底面和三个矩形侧面的多面体。",
+                vertices: 6,
+                edges: 9,
+                faces: 5
+            },
+            rectangularPrism: {
+                name: "四棱柱",
+                description: "具有两个平行且全等的矩形底面和四个矩形侧面的多面体，也称为长方体。",
+                vertices: 8,
+                edges: 12,
+                faces: 6
+            },
+            cylinder: {
+                name: "圆柱体",
+                description: "由两个平行且全等的圆形底面和一个曲面侧面组成的几何体。",
+                vertices: 0,
+                edges: 0,
+                faces: 3
+            },
+            triangularPyramid: {
+                name: "三棱锥",
+                description: "由一个三角形底面和三个三角形侧面相交于一个顶点组成的多面体。",
+                vertices: 4,
+                edges: 6,
+                faces: 4
+            },
+            pentagonalPyramid: {
+                name: "五棱锥",
+                description: "由一个五边形底面和五个三角形侧面相交于一个顶点组成的多面体。",
+                vertices: 6,
+                edges: 10,
+                faces: 6
+            },
+            pentagonalPrism: {
+                name: "五棱柱",
+                description: "具有两个平行且全等的五边形底面和五个矩形侧面的多面体。",
+                vertices: 10,
+                edges: 15,
+                faces: 7
+            },
+            conicalFrustum: {
+                name: "圆台",
+                description: "圆锥被平行于底面的平面截去锥顶部分后剩下的几何体。",
+                vertices: 0,
+                edges: 0,
+                faces: 3
+            }
+        };
+        
+        // 初始化GeoGebra应用
+        function initGeoGebra() {
+            const parameters = {
+                "appName": "3d",
+                "width": "800",
+                "height": "600",
+                "showToolBar": true,
+                "showAlgebraInput": false,
+                "showMenuBar": false,
+                "allowStyleBar": true,
+                "enable3d": true,
+                "perspective": "O",
+                "appletOnLoad": function(api) {
+                    window.ggbApp = api;
+                    createShape(currentShape, currentHeight, currentRadius);
+                    updateShapeInfo(currentShape);
+                }
+            };
+            
+            const applet = new GGBApplet(parameters, true);
+            applet.inject('ggb-element');
+        }
+        
+        // 删除旧对象
+        function removeOldObjects() {
+            if (ggbApp && oldObjects.length > 0) {
+                for (let obj of oldObjects) {
+                    try {
+                        ggbApp.deleteObject(obj);
+                    } catch(e) {
+                        console.log("删除对象时出错:", obj, e);
+                    }
+                }
+                oldObjects = [];
+            }
+        }
+        
+        // 创建几何体
+        function createShape(shape, height, radius) {
+            if (!ggbApp) return;
+            
+            // 删除之前创建的几何体
+            removeOldObjects();
+            
+            // 重置视图
+            ggbApp.reset();
+            
+            switch(shape) {
+                case 'triangularPrism':
+                    createTriangularPrism(height);
+                    break;
+                case 'rectangularPrism':
+                    createRectangularPrism(height);
+                    break;
+                case 'cylinder':
+                    createCylinder(height, radius);
+                    break;
+                case 'triangularPyramid':
+                    createTriangularPyramid(height);
+                    break;
+                case 'pentagonalPyramid':
+                    createPentagonalPyramid(height);
+                    break;
+                case 'pentagonalPrism':
+                    createPentagonalPrism(height);
+                    break;
+                case 'conicalFrustum':
+                    createConicalFrustum(height, radius);
+                    break;
+            }
+            
+            // 设置线框模式
+            setWireframeMode(wireframeMode);
+            
+            // 更新状态栏
+            updateShapeStats();
+        }
+        
+        // 创建三棱柱
+        function createTriangularPrism(height) {
+            const commands = [
+                "A = (1, 0, 0)",
+                "B = (-0.5, 0.866, 0)",
+                "C = (-0.5, -0.866, 0)",
+                `D = (1, 0, ${height})`,
+                `E = (-0.5, 0.866, ${height})`,
+                `F = (-0.5, -0.866, ${height})`,
+                "poly1 = Polygon(A, B, C)",
+                "poly2 = Polygon(D, E, F)",
+                "poly3 = Polygon(A, B, E, D)",
+                "poly4 = Polygon(B, C, F, E)",
+                "poly5 = Polygon(C, A, D, F)",
+                "SetVisibleInView({poly1, poly2, poly3, poly4, poly5}, 1, true)"
+            ];
+            
+            // 记录所有创建的对象
+            oldObjects = ['A', 'B', 'C', 'D', 'E', 'F', 'poly1', 'poly2', 'poly3', 'poly4', 'poly5'];
+            
+            // 执行所有命令
+            executeCommands(commands);
+        }
+        
+        // 创建四棱柱（长方体）
+        function createRectangularPrism(height) {
+            const commands = [
+                "A = (-1, -1, 0)",
+                "B = (1, -1, 0)",
+                "C = (1, 1, 0)",
+                "D = (-1, 1, 0)",
+                `E = (-1, -1, ${height})`,
+                `F = (1, -1, ${height})`,
+                `G = (1, 1, ${height})`,
+                `H = (-1, 1, ${height})`,
+                "poly1 = Polygon(A, B, C, D)",
+                "poly2 = Polygon(E, F, G, H)",
+                "poly3 = Polygon(A, B, F, E)",
+                "poly4 = Polygon(B, C, G, F)",
+                "poly5 = Polygon(C, D, H, G)",
+                "poly6 = Polygon(D, A, E, H)",
+                "SetVisibleInView({poly1, poly2, poly3, poly4, poly5, poly6}, 1, true)"
+            ];
+            
+            oldObjects = ['A','B','C','D','E','F','G','H','poly1','poly2','poly3','poly4','poly5','poly6'];
+            executeCommands(commands);
+        }
+        
+        // 创建圆柱体
+        function createCylinder(height, radius) {
+            const commands = [
+                "A = (0, 0, 0)",
+                `B = (0, 0, ${height})`,
+                `circle1 = Circle(A, (${radius}, 0, 0))`,
+                `circle2 = Circle(B, (${radius}, 0, ${height}))`,
+                `side = Cylinder(circle1, ${height})`,
+                "SetVisibleInView({circle1, circle2, side}, 1, true)"
+            ];
+            
+            oldObjects = ['A','B','circle1','circle2','side'];
+            executeCommands(commands);
+        }
+        
+        // 创建三棱锥
+        function createTriangularPyramid(height) {
+            const commands = [
+                "A = (1, 0, 0)",
+                "B = (-0.5, 0.866, 0)",
+                "C = (-0.5, -0.866, 0)",
+                `D = (0, 0, ${height})`,
+                "poly1 = Polygon(A, B, C)",
+                "poly2 = Polygon(A, B, D)",
+                "poly3 = Polygon(B, C, D)",
+                "poly4 = Polygon(C, A, D)",
+                "SetVisibleInView({poly1, poly2, poly3, poly4}, 1, true)"
+            ];
+            
+            oldObjects = ['A','B','C','D','poly1','poly2','poly3','poly4'];
+            executeCommands(commands);
+        }
+        
+        // 创建五棱锥
+        function createPentagonalPyramid(height) {
+            const commands = [
+                "n = 5",
+                "angle = 2 * pi / n",
+                "r = 1",
+                "points = Sequence((r * cos(i * angle), r * sin(i * angle), 0), i, 0, n-1)",
+                "basePoly = Polygon(points)",
+                `apex = Point({0, 0, ${height}})`,
+                "sides1 = Sequence(Polygon(Element(points, i), Element(points, i+1), apex), i, 1, n-1)",
+                "sides2 = Join(sides1, {Polygon(Element(points, n), Element(points, 1), apex)})",
+                "SetVisibleInView(Join({basePoly}, sides1), 1, true)"
+            ];
+            
+            oldObjects = ['n', 'angle', 'r', 'points', 'basePoly', 'apex', 'sides1', 'sides2'];
+            executeCommands(commands);
+        }
+        
+        // 创建五棱柱
+        function createPentagonalPrism(height) {
+            const commands = [
+                "n = 5",
+                "angle = 2 * pi / n",
+                "r = 1",
+                "bottomPoints = Sequence((r * cos(i * angle), r * sin(i * angle), 0), i, 0, n-1)",
+                `topPoints = Sequence((r * cos(i * angle), r * sin(i * angle), ${height}), i, 0, n-1)`,
+                "bottomPoly = Polygon(bottomPoints)",
+                "topPoly = Polygon(topPoints)",
+                "sides1 = Sequence(Polygon(Element(bottomPoints, i), Element(bottomPoints, i+1), Element(topPoints, i+1), Element(topPoints, i)), i, 1, n-1)",
+                "sides2 = Join(sides1, {Polygon(Element(bottomPoints, n), Element(bottomPoints, 1), Element(topPoints, 1), Element(topPoints, n))})",
+                "SetVisibleInView(Join({bottomPoly, topPoly}, sides1), 1, true)"
+            ];
+            
+            oldObjects = ['n', 'angle', 'r', 'bottomPoints', 'topPoints', 'bottomPoly', 'topPoly', 'sides1', 'sides2'];
+            executeCommands(commands);
+        }
+        
+        // 创建圆台
+        function createConicalFrustum(height, radius) {
+            const topRadius = radius * 0.6;
+            const commands = [
+                "bottomCenter = Point({0, 0, 0})",
+                `topCenter = Point({0, 0, ${height}})`,
+                `bottomRadius = Point({${radius}, 0, 0})`,
+                `topRadius1 = Point({${topRadius}, 0, ${height}})`,
+                "polygon = PolyLine(bottomCenter, bottomRadius, topRadius1, topCenter)",
+                `bottomCircle = Circle(bottomCenter, (${radius}, 0, 0))`,
+                `topCircle = Circle(topCenter, (${topRadius}, 0, ${height}))`,
+
+                `side = Surface(polygon, 360°, Line(bottomCenter, topCenter))`,
+                "SetVisibleInView({bottomCircle, topCircle, side}, 1, true)"
+            ];
+
+            oldObjects = ['bottomCenter', 'topCenter', 'bottomRadius', 'topRadius1', 'bottomCircle', 'topCircle', 'polygon', 'side'];
+            executeCommands(commands);
+            ggbApp.setVisible('bottomCenter');
+            ggbApp.setVisible('bottomRadius');
+            ggbApp.setVisible('topRadius1');
+            ggbApp.setVisible('topCenter');
+            ggbApp.setVisible('polygon');
+        }
+        
+        // 执行多条命令
+        function executeCommands(commands) {
+            if (!ggbApp) return;
+            
+            for (let cmd of commands) {
+                try {
+                    ggbApp.evalCommand(cmd);
+                } catch (e) {
+                    console.error("执行命令时出错:", cmd, e);
+                }
+            }
+        }
+        
+        // 设置线框模式
+        function setWireframeMode(enabled) {
+            if (!ggbApp || oldObjects.length === 0) return;
+            
+            const fillOpacity = enabled ? "0" : "1";
+            const lineOpacity = "1";
+            
+            for (let obj of oldObjects) {
+                try {
+                    ggbApp.setLineOpacity(obj, lineOpacity);
+                    ggbApp.setFillOpacity(obj, fillOpacity);
+                } catch(e) {
+                    // 忽略无法设置的对象
+                }
+            }
+        }
+        
+        // 更新几何体信息
+        function updateShapeInfo(shape) {
+            const info = shapeInfo[shape];
+            document.getElementById('shapeName').textContent = info.name;
+            document.getElementById('shapeDescription').textContent = info.description;
+            
+            // 更新状态栏
+            updateShapeStats();
+        }
+        
+        // 更新状态栏
+        function updateShapeStats() {
+            const info = shapeInfo[currentShape];
+            const stats = `当前几何体: ${info.name} | 高度: ${currentHeight.toFixed(1)} | 半径: ${currentRadius.toFixed(1)}`;
+            document.getElementById('shapeStats').textContent = stats;
+            
+            // 计算体积和表面积（简化计算）
+            let volume = 0;
+            let surfaceArea = 0;
+            
+            switch(currentShape) {
+                case 'triangularPrism':
+                    // 三棱柱体积 = 底面积 × 高
+                    volume = (0.5 * 1.732 * 1) * currentHeight;
+                    // 三棱柱表面积 = 2 × 底面积 + 侧面积
+                    surfaceArea = 2 * (0.5 * 1.732 * 1) + 3 * (1 * currentHeight);
+                    break;
+                case 'rectangularPrism':
+                    // 长方体体积 = 长×宽×高
+                    volume = 2 * 2 * currentHeight;
+                    // 长方体表面积 = 2(长×宽 + 长×高 + 宽×高)
+                    surfaceArea = 2 * (2*2 + 2*currentHeight + 2*currentHeight);
+                    break;
+                case 'cylinder':
+                    // 圆柱体积 = πr²h
+                    volume = Math.PI * currentRadius * currentRadius * currentHeight;
+                    // 圆柱表面积 = 2πr(h + r)
+                    surfaceArea = 2 * Math.PI * currentRadius * (currentHeight + currentRadius);
+                    break;
+                case 'triangularPyramid':
+                    // 三棱锥体积 = 1/3 × 底面积 × 高
+                    volume = (1/3) * (0.5 * 1.732 * 1) * currentHeight;
+                    // 三棱锥表面积 = 底面积 + 三个侧面面积
+                    surfaceArea = (0.5 * 1.732 * 1) + 3 * (0.5 * 1 * Math.sqrt(currentHeight*currentHeight + 0.75));
+                    break;
+                case 'pentagonalPyramid':
+                    // 五棱锥体积 = 1/3 × 底面积 × 高
+                    const pentagonArea = 1.72048; // 五边形面积常数
+                    volume = (1/3) * pentagonArea * currentHeight;
+                    // 五棱锥表面积 = 底面积 + 5个侧面面积
+                    surfaceArea = pentagonArea + 5 * (0.5 * 1.376 * Math.sqrt(currentHeight*currentHeight + 0.69));
+                    break;
+                case 'pentagonalPrism':
+                    // 五棱柱体积 = 底面积 × 高
+                    volume = 1.72048 * currentHeight;
+                    // 五棱柱表面积 = 2 × 底面积 + 5 × 侧面面积
+                    surfaceArea = 2 * 1.72048 + 5 * (1 * currentHeight);
+                    break;
+                case 'conicalFrustum':
+                    // 圆台体积 = 1/3 × πh(R² + Rr + r²)
+                    const topRadius = currentRadius * 0.6;
+                    volume = (1/3) * Math.PI * currentHeight * (currentRadius*currentRadius + currentRadius*topRadius + topRadius*topRadius);
+                    // 圆台表面积 = π(R² + r² + Rl + rl)
+                    const l = Math.sqrt(currentHeight*currentHeight + (currentRadius - topRadius)*(currentRadius - topRadius));
+                    surfaceArea = Math.PI * (currentRadius*currentRadius + topRadius*topRadius + currentRadius*l + topRadius*l);
+                    break;
+            }
+            
+            // 更新属性面板
+            document.getElementById('volumeValue').textContent = volume.toFixed(2);
+            document.getElementById('surfaceAreaValue').textContent = surfaceArea.toFixed(2);
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initGeoGebra();
+            
+            // 设置事件监听器
+            document.getElementById('shapeSelector').addEventListener('change', function() {
+                currentShape = this.value;
+                
+                // 根据几何体类型决定是否启用半径滑块
+                const radiusControl = document.getElementById('radiusControl');
+                if (currentShape === 'cylinder' || currentShape === 'conicalFrustum') {
+                    radiusControl.classList.remove('disabled');
+                } else {
+                    radiusControl.classList.add('disabled');
+                }
+                
+                createShape(currentShape, currentHeight, currentRadius);
+                updateShapeInfo(currentShape);
+            });
+            
+            const heightSlider = document.getElementById('heightSlider');
+            const heightValue = document.getElementById('heightValue');
+            
+            heightSlider.addEventListener('input', function() {
+                currentHeight = parseFloat(this.value);
+                heightValue.textContent = currentHeight.toFixed(1);
+                createShape(currentShape, currentHeight, currentRadius);
+            });
+            
+            const radiusSlider = document.getElementById('radiusSlider');
+            const radiusValue = document.getElementById('radiusValue');
+            
+            radiusSlider.addEventListener('input', function() {
+                currentRadius = parseFloat(this.value);
+                radiusValue.textContent = currentRadius.toFixed(1);
+                createShape(currentShape, currentHeight, currentRadius);
+            });
+            
+            document.getElementById('resetViewBtn').addEventListener('click', function() {
+                if (ggbApp) {
+                    ggbApp.evalCommand("ResetView()");
+                }
+            });
+            
+            document.getElementById('toggleLabelsBtn').addEventListener('click', function() {
+                if (ggbApp) {  
+                    labelsVisible = !labelsVisible;
+                    for (let obj of oldObjects) {
+                        try {
+                            ggbApp.setLabelVisible(obj, labelsVisible);
+                        } catch(e) {
+                            // 忽略无法设置的对象
+                        }
+                    }
+                }
+            });
+            
+            document.getElementById('wireframeBtn').addEventListener('click', function() {
+                wireframeMode = !wireframeMode;
+                setWireframeMode(wireframeMode);
+                
+                // 更新按钮文本
+                const icon = this.querySelector('i');
+                const text = this.querySelector('span');
+                if (text) {
+                    text.textContent = wireframeMode ? "实体模式" : "线框模式";
+                    icon.className = wireframeMode ? "fas fa-cube" : "fas fa-network-wired";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
