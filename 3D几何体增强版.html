@@ -358,7 +358,7 @@
     <div class="main-container">
         <div class="viewer-container">
             <div id="ggb-element"></div>
-            <div class="status-bar">
+            <div class="status-bar"  style="display:none">
                 <div id="shapeStats">当前几何体: 三棱柱 | 高度: 3.0 | 半径: 1.0</div>
                 <div class="shape-vertices">
                     <span>点: 6</span>
@@ -403,7 +403,7 @@
                 </div>
             </div>
             
-            <div class="control-group">
+            <div class="control-group"  style="display:none">
                 <h3><i class="fas fa-eye"></i> 视图控制</h3>
                 <div class="btn-group">
                     <button id="resetViewBtn" class="primary">
@@ -511,8 +511,10 @@
                 "perspective": "O",
                 "appletOnLoad": function(api) {
                     window.ggbApp = api;
+                    api.setPerspective("T");
                     createShape(currentShape, currentHeight, currentRadius);
                     updateShapeInfo(currentShape);
+                    
                 }
             };
             
@@ -866,7 +868,7 @@
             });
             
             document.getElementById('toggleLabelsBtn').addEventListener('click', function() {
-                if (ggbApp) {  
+                if (ggbApp) {
                     labelsVisible = !labelsVisible;
                     for (let obj of oldObjects) {
                         try {
