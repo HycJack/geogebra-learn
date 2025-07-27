@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二次函数探秘者：抛物线挑战</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: #ecf0f1;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        h1 {
+            color: #f1c40f;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+            margin-bottom: 10px;
+        }
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .canvas-container {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 40, 70, 0.7);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        canvas {
+            background: #2c3e50;
+            border-radius: 10px;
+            display: block;
+            width: 100%;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .control-panel {
+            flex: 0 0 300px;
+            background: rgba(30, 40, 70, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .param-control {
+            margin-bottom: 20px;
+        }
+        .param-control label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+        }
+        .slider-container input {
+            flex: 1;
+            margin: 0 10px;
+        }
+        .slider-value {
+            width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .mission-panel {
+            background: rgba(44, 62, 80, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .mission-header {
+            color: #f1c40f;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .mission {
+            background: rgba(26, 42, 108, 0.5);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mission:hover {
+            background: rgba(41, 128, 185, 0.5);
+            transform: translateY(-3px);
+        }
+        .mission.active {
+            background: rgba(46, 204, 113, 0.3);
+            border-left: 4px solid #f1c40f;
+        }
+        .mission h3 {
+            margin: 0 0 8px 0;
+            color: #3498db;
+        }
+        .mission p {
+            margin: 0;
+            font-size: 14px;
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            display: block;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #c0392b;
+        }
+        .btn:hover {
+            background: #c0392b;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #962d22;
+        }
+        .btn-check {
+            background: #2ecc71;
+            box-shadow: 0 4px 0 #27ae60;
+        }
+        .btn-check:hover {
+            background: #27ae60;
+            box-shadow: 0 2px 0 #219653;
+        }
+        .feedback {
+            text-align: center;
+            min-height: 30px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 18px;
+            color: #f1c40f;
+        }
+        .function-display {
+            text-align: center;
+            font-size: 24px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>二次函数探秘者：抛物线挑战</h1>
+            <p>通过调整参数a、b、c，探索抛物线奥秘，完成函数任务！</p>
+        </header>
+        
+        <div class="status-bar">
+            <div>任务进度: <span id="mission-progress">0</span>/3</div>
+            <div>得分: <span id="score">0</span></div>
+        </div>
+        
+        <div class="game-area">
+            <div class="canvas-container">
+                <div class="function-display">y = <span id="a-value">1</span>x² + <span id="b-value">0</span>x + <span id="c-value">0</span></div>
+                <canvas id="functionCanvas" width="600" height="500"></canvas>
+            </div>
+            
+            <div class="control-panel">
+                <div class="param-control">
+                    <label for="a-slider">参数 a (控制开口方向和大小)</label>
+                    <div class="slider-container">
+                        <span class="slider-value" id="a-display">1</span>
+                        <input type="range" id="a-slider" min="-5" max="5" step="0.1" value="1">
+                    </div>
+                </div>
+                
+                <div class="param-control">
+                    <label for="b-slider">参数 b (控制对称轴位置)</label>
+                    <div class="slider-container">
+                        <span class="slider-value" id="b-display">0</span>
+                        <input type="range" id="b-slider" min="-10" max="10" step="0.1" value="0">
+                    </div>
+                </div>
+                
+                <div class="param-control">
+                    <label for="c-slider">参数 c (控制y轴截距)</label>
+                    <div class="slider-container">
+                        <span class="slider-value" id="c-display">0</span>
+                        <input type="range" id="c-slider" min="-20" max="20" step="0.1" value="0">
+                    </div>
+                </div>
+                
+                <div class="feedback" id="feedback">调整参数完成下方任务！</div>
+                
+                <button id="checkMission" class="btn btn-check">检查任务</button>
+                <button id="resetBtn" class="btn">重置函数</button>
+                
+                <div class="mission-panel">
+                    <h3 class="mission-header">函数挑战任务</h3>
+                    <div class="mission active" data-mission="1">
+                        <h3>任务 1: 穿越坐标点</h3>
+                        <p>让抛物线穿过点(2, 4)和点(-1, 1)</p>
+                    </div>
+                    <div class="mission" data-mission="2">
+                        <h3>任务 2: 顶点挑战</h3>
+                        <p>使函数顶点位于(1, 4)</p>
+                    </div>
+                    <div class="mission" data-mission="3">
+                        <h3>任务 3: 根的秘密</h3>
+                        <p>创建有两个根的函数，且根之和为3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const canvas = document.getElementById('functionCanvas');
+        const ctx = canvas.getContext('2d');
+        const aSlider = document.getElementById('a-slider');
+        const bSlider = document.getElementById('b-slider');
+        const cSlider = document.getElementById('c-slider');
+        const aDisplay = document.getElementById('a-display');
+        const bDisplay = document.getElementById('b-display');
+        const cDisplay = document.getElementById('c-display');
+        const aValue = document.getElementById('a-value');
+        const bValue = document.getElementById('b-value');
+        const cValue = document.getElementById('c-value');
+        const feedback = document.getElementById('feedback');
+        const checkMissionBtn = document.getElementById('checkMission');
+        const resetBtn = document.getElementById('resetBtn');
+        const missions = document.querySelectorAll('.mission');
+        const missionProgress = document.getElementById('mission-progress');
+        const scoreDisplay = document.getElementById('score');
+
+        // 游戏状态
+        let gameState = {
+            a: 1,
+            b: 0,
+            c: 0,
+            currentMission: 1,
+            completedMissions: [],
+            score: 0
+        };
+
+        // 初始化
+        function init() {
+            drawCoordinateSystem();
+            drawFunction();
+            updateSliders();
+            updateMissionStatus();
+            
+            // 添加事件监听
+            aSlider.addEventListener('input', handleSliderChange);
+            bSlider.addEventListener('input', handleSliderChange);
+            cSlider.addEventListener('input', handleSliderChange);
+            checkMissionBtn.addEventListener('click', checkMission);
+            resetBtn.addEventListener('click', resetFunction);
+            
+            missions.forEach(mission => {
+                mission.addEventListener('click', () => {
+                    if (!gameState.completedMissions.includes(parseInt(mission.dataset.mission))) {
+                        gameState.currentMission = parseInt(mission.dataset.mission);
+                        updateMissionStatus();
+                        feedback.textContent = `已切换到任务 ${gameState.currentMission}`;
+                    }
+                });
+            });
+        }
+
+        // 处理滑块变化
+        function handleSliderChange() {
+            gameState.a = parseFloat(aSlider.value);
+            gameState.b = parseFloat(bSlider.value);
+            gameState.c = parseFloat(cSlider.value);
+            
+            aDisplay.textContent = gameState.a.toFixed(1);
+            bDisplay.textContent = gameState.b.toFixed(1);
+            cDisplay.textContent = gameState.c.toFixed(1);
+            
+            aValue.textContent = gameState.a.toFixed(1);
+            bValue.textContent = gameState.b.toFixed(1);
+            cValue.textContent = gameState.c.toFixed(1);
+            
+            drawCoordinateSystem();
+            drawFunction();
+        }
+
+        // 绘制坐标系
+        function drawCoordinateSystem() {
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // 清除画布
+            ctx.clearRect(0, 0, width, height);
+            
+            // 绘制网格
+            ctx.strokeStyle = 'rgba(200, 200, 200, 0.2)';
+            ctx.lineWidth = 1;
+            
+            // 垂直线
+            for (let x = width/2; x < width; x += 30) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(width - x, 0);
+                ctx.lineTo(width - x, height);
+                ctx.stroke();
+            }
+            
+            // 水平线
+            for (let y = height/2; y < height; y += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, height - y);
+                ctx.lineTo(width, height - y);
+                ctx.stroke();
+            }
+            
+            // 绘制坐标轴
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 2;
+            
+            // X轴
+            ctx.beginPath();
+            ctx.moveTo(0, height/2);
+            ctx.lineTo(width, height/2);
+            ctx.stroke();
+            
+            // Y轴
+            ctx.beginPath();
+            ctx.moveTo(width/2, 0);
+            ctx.lineTo(width/2, height);
+            ctx.stroke();
+            
+            // 绘制刻度
+            ctx.fillStyle = '#ecf0f1';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            
+            // X轴刻度
+            for (let x = -10; x <= 10; x++) {
+                if (x === 0) continue;
+                const px = width/2 + x * 30;
+                ctx.beginPath();
+                ctx.moveTo(px, height/2 - 5);
+                ctx.lineTo(px, height/2 + 5);
+                ctx.stroke();
+                
+                ctx.fillText(x.toString(), px, height/2 + 8);
+            }
+            
+            // Y轴刻度
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            for (let y = -8; y <= 8; y++) {
+                if (y === 0) continue;
+                const py = height/2 - y * 30;
+                ctx.beginPath();
+                ctx.moveTo(width/2 - 5, py);
+                ctx.lineTo(width/2 + 5, py);
+                ctx.stroke();
+                
+                ctx.fillText(y.toString(), width/2 - 8, py);
+            }
+            
+            // 绘制原点
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.arc(width/2, height/2, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillText('O', width/2 + 15, height/2 + 8);
+            
+            // 绘制坐标轴标签
+            ctx.fillStyle = '#f1c40f';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'top';
+            ctx.fillText('Y', width/2 - 10, 10);
+            
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('X', width - 10, height/2 - 10);
+        }
+
+        // 绘制二次函数
+        function drawFunction() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const scale = 30; // 每单位30像素
+            
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            let isFirstPoint = true;
+            
+            for (let x = -10; x <= 10; x += 0.1) {
+                const px = width/2 + x * scale;
+                const y = gameState.a * x * x + gameState.b * x + gameState.c;
+                const py = height/2 - y * scale;
+                
+                if (py >= 0 && py <= height) {
+                    if (isFirstPoint) {
+                        ctx.moveTo(px, py);
+                        isFirstPoint = false;
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+            }
+            
+            ctx.stroke();
+            
+            // 标记顶点
+            const vertexX = -gameState.b / (2 * gameState.a);
+            const vertexY = gameState.a * vertexX * vertexX + gameState.b * vertexX + gameState.c;
+            const vertexPx = width/2 + vertexX * scale;
+            const vertexPy = height/2 - vertexY * scale;
+            
+            if (!isNaN(vertexPx) && !isNaN(vertexPy) && 
+                vertexPx >= 0 && vertexPx <= width && 
+                vertexPy >= 0 && vertexPy <= height) {
+                
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(vertexPx, vertexPy, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.font = '12px Arial';
+                ctx.fillStyle = '#f1c40f';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(`顶点(${vertexX.toFixed(1)},${vertexY.toFixed(1)})`, vertexPx, vertexPy - 10);
+            }
+            
+            // 标记根
+            const discriminant = gameState.b * gameState.b - 4 * gameState.a * gameState.c;
+            if (discriminant >= 0) {
+                const root1 = (-gameState.b + Math.sqrt(discriminant)) / (2 * gameState.a);
+                const root2 = (-gameState.b - Math.sqrt(discriminant)) / (2 * gameState.a);
+                
+                const root1Px = width/2 + root1 * scale;
+                const root2Px = width/2 + root2 * scale;
+                const rootPy = height/2;
+                
+                if (!isNaN(root1Px) && root1Px >= 0 && root1Px <= width) {
+                    ctx.fillStyle = '#2ecc71';
+                    ctx.beginPath();
+                    ctx.arc(root1Px, rootPy, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                if (!isNaN(root2Px) && root2Px >= 0 && root2Px <= width) {
+                    ctx.beginPath();
+                    ctx.arc(root2Px, rootPy, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // 更新滑块显示
+        function updateSliders() {
+            aSlider.value = gameState.a;
+            bSlider.value = gameState.b;
+            cSlider.value = gameState.c;
+            
+            aDisplay.textContent = gameState.a.toFixed(1);
+            bDisplay.textContent = gameState.b.toFixed(1);
+            cDisplay.textContent = gameState.c.toFixed(1);
+            
+            aValue.textContent = gameState.a.toFixed(1);
+            bValue.textContent = gameState.b.toFixed(1);
+            cValue.textContent = gameState.c.toFixed(1);
+        }
+
+        // 更新任务状态
+        function updateMissionStatus() {
+            missions.forEach(mission => {
+                const missionId = parseInt(mission.dataset.mission);
+                mission.classList.remove('active');
+                
+                if (missionId === gameState.currentMission) {
+                    mission.classList.add('active');
+                }
+                
+                if (gameState.completedMissions.includes(missionId)) {
+                    mission.style.opacity = '0.6';
+                    mission.querySelector('h3').innerHTML += ' ✓';
+                } else {
+                    mission.style.opacity = '1';
+                }
+            });
+            
+            missionProgress.textContent = gameState.completedMissions.length;
+            scoreDisplay.textContent = gameState.score;
+        }
+
+        // 检查任务
+        function checkMission() {
+            const missionId = gameState.currentMission;
+            let success = false;
+            let message = '';
+            
+            switch (missionId) {
+                case 1:
+                    // 检查抛物线是否穿过(2,4)和(-1,1)
+                    const y1 = gameState.a * 4 + gameState.b * 2 + gameState.c;
+                    const y2 = gameState.a * 1 - gameState.b + gameState.c;
+                    
+                    success = Math.abs(y1 - 4) < 0.2 && Math.abs(y2 - 1) < 0.2;
+                    message = success ? 
+                        '任务完成！抛物线穿过(2,4)和(-1,1)' :
+                        '未通过点(2,4)和(-1,1)，请继续调整参数';
+                    break;
+                    
+                case 2:
+                    // 检查顶点是否在(1,4)
+                    const vertexX = -gameState.b / (2 * gameState.a);
+                    const vertexY = gameState.a * vertexX * vertexX + gameState.b * vertexX + gameState.c;
+                    
+                    success = Math.abs(vertexX - 1) < 0.1 && Math.abs(vertexY - 4) < 0.1;
+                    message = success ? 
+                        '完美！顶点正好在(1,4)' :
+                        `当前顶点(${vertexX.toFixed(1)},${vertexY.toFixed(1)})，目标(1,4)`;
+                    break;
+                    
+                case 3:
+                    // 检查有两个根且根之和为3
+                    const discriminant = gameState.b * gameState.b - 4 * gameState.a * gameState.c;
+                    const sumRoots = -gameState.b / gameState.a;
+                    
+                    success = discriminant > 0 && Math.abs(sumRoots - 3) < 0.1;
+                    message = success ? 
+                        '成功！函数有两个根且根之和为3' :
+                        `根之和为${sumRoots.toFixed(1)}，目标为3`;
+                    break;
+            }
+            
+            feedback.textContent = message;
+            
+            if (success) {
+                if (!gameState.completedMissions.includes(missionId)) {
+                    gameState.completedMissions.push(missionId);
+                    gameState.score += 100;
+                    
+                    // 粒子效果
+                    createParticles(canvas.width/2, 100);
+                    
+                    // 自动切换到下一个任务
+                    if (missionId < 3) {
+                        gameState.currentMission = missionId + 1;
+                    }
+                }
+                
+                updateMissionStatus();
+            }
+        }
+
+        // 重置函数
+        function resetFunction() {
+            gameState.a = 1;
+            gameState.b = 0;
+            gameState.c = 0;
+            updateSliders();
+            drawCoordinateSystem();
+            drawFunction();
+            feedback.textContent = '函数已重置为 y = x²';
+        }
+
+        // 粒子效果（用于任务完成反馈）
+        function createParticles(x, y) {
+            const particles = [];
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71'];
+            
+            // 创建粒子
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    size: Math.random() * 5 + 2,
+                    speedX: (Math.random() - 0.5) * 10,
+                    speedY: (Math.random() - 0.5) * 10,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 30
+                });
+            }
+            
+            // 动画粒子
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawCoordinateSystem();
+                drawFunction();
+                
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    
+                    if (p.life > 0) {
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        p.x += p.speedX;
+                        p.y += p.speedY;
+                        p.life--;
+                        p.size *= 0.95;
+                    }
+                }
+                
+                if (particles.some(p => p.life > 0)) {
+                    requestAnimationFrame(animateParticles);
+                }
+            }
+            
+            animateParticles();
+        }
+
+        // 页面加载完成后初始化游戏
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

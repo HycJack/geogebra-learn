@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>匀速圆周运动与正弦函数关联演示（修正相位显示）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(25, 35, 60, 0.7);
+        }
+        h1 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        .animation-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .canvas-container {
+            background: rgba(25, 35, 60, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a5a8c;
+            flex: 1;
+            min-width: 400px;
+            max-width: 550px;
+        }
+        .canvas-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            font-size: 1.4rem;
+        }
+        canvas {
+            background: #0f1429;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        .controls {
+            background: rgba(25, 35, 60, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 0 auto 30px;
+            max-width: 900px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a5a8c;
+        }
+        .control-group {
+            margin-bottom: 25px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .slider-label {
+            min-width: 150px;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        .slider-wrapper {
+            flex: 1;
+            min-width: 250px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #2c3e50;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ff416c;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 65, 108, 0.5);
+        }
+        .value-display {
+            min-width: 80px;
+            padding: 5px 12px;
+            background: rgba(79, 195, 247, 0.2);
+            border-radius: 20px;
+            text-align: center;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(255, 75, 43, 0.6);
+        }
+        .explanation {
+            background: rgba(25, 35, 60, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 0 auto;
+            max-width: 900px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #4a5a8c;
+            line-height: 1.6;
+        }
+        .math-equation {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(25, 35, 60, 0.9);
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-family: 'Times New Roman', serif;
+            border: 1px solid #ff416c;
+        }
+        .phase-display {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-family: monospace;
+        }
+        @media (max-width: 900px) {
+            .animation-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .canvas-container {
+                min-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>匀速圆周运动与正弦函数关联演示</h1>
+            <p class="subtitle">左侧：匀速圆周运动 | 右侧：垂直位移随时间变化的正弦波 | 角速度为负值时顺时针运动</p>
+        </header>
+        
+        <div class="animation-container">
+            <div class="canvas-container">
+                <h2 class="canvas-title">圆周运动</h2>
+                <canvas id="circleCanvas" width="500" height="500"></canvas>
+            </div>
+            
+            <div class="canvas-container">
+                <h2 class="canvas-title">正弦函数轨迹</h2>
+                <canvas id="sineCanvas" width="500" height="500"></canvas>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>运动参数控制</h3>
+                <div class="slider-container">
+                    <div class="slider-label">振幅 (A): 0-10</div>
+                    <div class="slider-wrapper">
+                        <input type="range" id="amplitudeSlider" min="0" max="10" step="0.1" value="5">
+                    </div>
+                    <div class="value-display" id="amplitudeValue">5.0</div>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">角速度 (ω): -2~+8</div>
+                    <div class="slider-wrapper">
+                        <input type="range" id="angularVelocitySlider" min="-20" max="80" step="1" value="30">
+                    </div>
+                    <div class="value-display" id="angularVelocityValue">3.0</div>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">初始相位 (φ): π/6为单位</div>
+                    <div class="slider-wrapper">
+                        <input type="range" id="phaseSlider" min="0" max="12" step="1" value="0">
+                    </div>
+                    <div class="value-display" id="phaseValue">0π</div>
+                </div>
+                
+                <div class="phase-display">
+                    <span id="phaseRadDisplay">φ = 0.00 rad</span> | 
+                    <span id="phaseDegDisplay">0.00°</span>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="startBtn">开始动画</button>
+                <button id="pauseBtn">暂停</button>
+                <button id="resetBtn">重置</button>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <h3>数学原理与参数说明</h3>
+            <div class="math-equation">
+                P点坐标: x = A·cos(ωt + φ) &emsp; y = A·sin(ωt + φ)<br>
+                正弦函数: y = A·sin(ωt + φ)
+            </div>
+            
+            <p><strong>参数说明：</strong></p>
+            <ul>
+                <li><strong>振幅 (A)</strong>：圆周的半径，决定正弦曲线的幅度（范围：0-10）</li>
+                <li><strong>角速度 (ω)</strong>：决定圆周运动速度（范围：-2~+8），正值时逆时针运动，负值时顺时针运动</li>
+                <li><strong>初始相位 (φ)</strong>：t=0时的起始角度（以π/6为单位刻度显示，范围：0-2π）</li>
+                <li><strong>时间范围</strong>：0~4π（约12.57秒），覆盖两个完整周期</li>
+            </ul>
+            <p>右侧正弦波展示点P的垂直位移（y坐标）随时间变化的轨迹。</p>
+        </div>
+    </div>
+
+    <script>
+        // 获取Canvas元素和上下文
+        const circleCanvas = document.getElementById('circleCanvas');
+        const sineCanvas = document.getElementById('sineCanvas');
+        const circleCtx = circleCanvas.getContext('2d');
+        const sineCtx = sineCanvas.getContext('2d');
+        
+        // 获取控制元素
+        const amplitudeSlider = document.getElementById('amplitudeSlider');
+        const angularVelocitySlider = document.getElementById('angularVelocitySlider');
+        const phaseSlider = document.getElementById('phaseSlider');
+        const amplitudeValue = document.getElementById('amplitudeValue');
+        const angularVelocityValue = document.getElementById('angularVelocityValue');
+        const phaseValue = document.getElementById('phaseValue');
+        const phaseRadDisplay = document.getElementById('phaseRadDisplay');
+        const phaseDegDisplay = document.getElementById('phaseDegDisplay');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // 相位刻度标签 (0-2π，以π/6为步进)
+        const phaseLabels = [
+            '0', 'π/6', 'π/3', 'π/2', '2π/3', '5π/6', 
+            'π', '7π/6', '4π/3', '3π/2', '5π/3', '11π/6', '2π'
+        ];
+        
+        // 动画参数
+        let amplitude = parseFloat(amplitudeSlider.value);  // 振幅 (0-10)
+        let angularVelocity = parseInt(angularVelocitySlider.value) / 10;  // 角速度 (-2~+8)
+        let phase = parseInt(phaseSlider.value) * Math.PI / 6;  // 初始相位 (以π/6为步进)
+        let animationId = null;
+        let isPlaying = false;
+        let startTime = null;
+        let elapsedTime = 0;
+        let pauseTime = null;
+        
+        // 圆周中心坐标
+        const circleCenterX = circleCanvas.width / 2;
+        const circleCenterY = circleCanvas.height / 2;
+        
+        // 正弦图坐标系参数
+        const sinePadding = 50;
+        const sineAxisY = sineCanvas.height / 2;
+        const maxTime = 4 * Math.PI; // 时间范围：0-4π ≈12.57
+        const timeScale = (sineCanvas.width - 2 * sinePadding) / maxTime;
+        
+        // 历史轨迹点
+        let historyPoints = [];
+        const maxHistoryPoints = 800;
+        
+        // 初始化显示值
+        amplitudeValue.textContent = amplitude.toFixed(1);
+        angularVelocityValue.textContent = angularVelocity.toFixed(1);
+        updatePhaseDisplay();
+        
+        // 更新相位显示（以π/6为单位）
+        function updatePhaseDisplay() {
+            const sliderIndex = parseInt(phaseSlider.value);
+            
+            // 设置相位显示标签
+            if (sliderIndex < phaseLabels.length) {
+                phaseValue.textContent = phaseLabels[sliderIndex];
+            } else {
+                phaseValue.textContent = "2π";
+            }
+            
+            // 更新实际的相位值 (0 - 2π)
+            phase = sliderIndex * Math.PI / 6;
+            
+            // 更新显示值
+            phaseRadDisplay.textContent = `φ = ${phase.toFixed(2)} rad`;
+            phaseDegDisplay.textContent = `${(phase * 180 / Math.PI).toFixed(2)}°`;
+        }
+        
+        // 绘制圆周运动（支持负角速度的顺时针运动）
+        function drawCircleMotion(t) {
+            // 清除画布
+            circleCtx.clearRect(0, 0, circleCanvas.width, circleCanvas.height);
+            
+            // 计算当前角度（支持负角速度的顺时针运动）
+            const angle = -(angularVelocity * t + phase); 
+            
+            // 计算点P的位置（放大30倍使运动可见）
+            const radius = amplitude * 30;
+            const pointX = circleCenterX + radius * Math.cos(angle);
+            const pointY = circleCenterY + radius * Math.sin(angle);
+            
+            // 绘制圆周
+            circleCtx.beginPath();
+            circleCtx.arc(circleCenterX, circleCenterY, radius, 0, Math.PI * 2);
+            circleCtx.strokeStyle = '#4fc3f7';
+            circleCtx.lineWidth = 2;
+            circleCtx.stroke();
+            
+            // 绘制坐标轴
+            circleCtx.beginPath();
+            circleCtx.moveTo(circleCenterX - radius - 20, circleCenterY);
+            circleCtx.lineTo(circleCenterX + radius + 20, circleCenterY);
+            circleCtx.moveTo(circleCenterX, circleCenterY - radius - 20);
+            circleCtx.lineTo(circleCenterX, circleCenterY + radius + 20);
+            circleCtx.strokeStyle = '#aaaaaa';
+            circleCtx.lineWidth = 1;
+            circleCtx.stroke();
+            
+            // 绘制坐标轴标签
+            circleCtx.fillStyle = '#ffffff';
+            circleCtx.font = '14px Arial';
+            circleCtx.fillText('x', circleCenterX + radius + 25, circleCenterY + 5);
+            circleCtx.fillText('y', circleCenterX - 10, circleCenterY - radius - 25);
+            
+            // 绘制从圆心到点P的连线
+            circleCtx.beginPath();
+            circleCtx.moveTo(circleCenterX, circleCenterY);
+            circleCtx.lineTo(pointX, pointY);
+            circleCtx.strokeStyle = '#ffcc00';
+            circleCtx.lineWidth = 2;
+            circleCtx.stroke();
+            
+            // 绘制点P（红色）
+            circleCtx.beginPath();
+            circleCtx.arc(pointX, pointY, 8, 0, Math.PI * 2);
+            circleCtx.fillStyle = '#ff416c';
+            circleCtx.fill();
+            
+            // 绘制垂直投影线（虚线）
+            circleCtx.beginPath();
+            circleCtx.moveTo(pointX, pointY);
+            circleCtx.lineTo(circleCenterX, pointY);
+            circleCtx.setLineDash([5, 3]);
+            circleCtx.strokeStyle = 'rgba(255, 65, 108, 0.7)';
+            circleCtx.lineWidth = 1;
+            circleCtx.stroke();
+            circleCtx.setLineDash([]);
+            
+            // 返回当前点P的y坐标（用于正弦图）
+            return pointY;
+        }
+        
+        // 绘制正弦函数轨迹（时间轴以π/6为单位刻度）
+        function drawSineWave(t, pointY) {
+            // 保存当前点
+            const point = {
+                x: t,
+                y: pointY,
+                t: t
+            };
+            
+            // 添加到历史轨迹
+            historyPoints.push(point);
+            
+            // 限制历史轨迹点数量
+            if (historyPoints.length > maxHistoryPoints) {
+                historyPoints.shift();
+            }
+            
+            // 清除画布
+            sineCtx.clearRect(0, 0, sineCanvas.width, sineCanvas.height);
+            
+            // 绘制坐标轴
+            sineCtx.beginPath();
+            sineCtx.moveTo(sinePadding, 30);
+            sineCtx.lineTo(sinePadding, sineCanvas.height - 30);
+            sineCtx.moveTo(sinePadding, sineAxisY);
+            sineCtx.lineTo(sineCanvas.width - 30, sineAxisY);
+            sineCtx.strokeStyle = '#aaaaaa';
+            sineCtx.lineWidth = 1;
+            sineCtx.stroke();
+            
+            // 绘制坐标轴标签
+            sineCtx.fillStyle = '#ffffff';
+            sineCtx.font = '14px Arial';
+            sineCtx.fillText('t (时间)', sineCanvas.width - 40, sineAxisY + 20);
+            sineCtx.fillText('y (位移)', sinePadding - 40, 20);
+            
+            // 绘制时间刻度 (0-4π，以π/6为步进)
+            for (let i = 0; i <= 24; i++) { // 24 steps (4π / (π/6) = 24)
+                const tm = i * Math.PI / 6;
+                const x = sinePadding + tm * timeScale;
+                
+                // 只绘制可见区域内的刻度
+                if (x < sinePadding || x > sineCanvas.width - 30) continue;
+                
+                // 绘制刻度线
+                sineCtx.beginPath();
+                sineCtx.moveTo(x, sineAxisY - 5);
+                sineCtx.lineTo(x, sineAxisY + 5);
+                sineCtx.strokeStyle = '#4fc3f7';
+                sineCtx.lineWidth = 1;
+                sineCtx.stroke();
+                
+                // 标注主要刻度值 (π/2的倍数)
+                if (i % 3 === 0) {
+                    const piValue = tm / Math.PI;
+                    let label = '';
+                    
+                    if (piValue === 0) label = "0";
+                    else if (piValue === 0.5) label = "π/2";
+                    else if (piValue === 1) label = "π";
+                    else if (piValue === 1.5) label = "3π/2";
+                    else if (piValue === 2) label = "2π";
+                    else if (piValue === 2.5) label = "5π/2";
+                    else if (piValue === 3) label = "3π";
+                    else if (piValue === 3.5) label = "7π/2";
+                    else if (piValue === 4) label = "4π";
+                    else label = `${piValue.toFixed(1)}π`;
+                    
+                    sineCtx.fillStyle = '#ffcc00';
+                    sineCtx.font = '12px Arial';
+                    sineCtx.textAlign = 'center';
+                    sineCtx.fillText(label, x, sineAxisY + 25);
+                }
+            }
+            
+            // 绘制振幅标记
+            sineCtx.fillStyle = '#ffffff';
+            sineCtx.font = '12px Arial';
+            sineCtx.textAlign = 'right';
+            sineCtx.fillText(`A = ${amplitude.toFixed(1)}`, sinePadding - 5, sineAxisY - amplitude * 30 - 5);
+            sineCtx.fillText(`-A = -${amplitude.toFixed(1)}`, sinePadding - 5, sineAxisY + amplitude * 30 + 15);
+            
+            // 绘制正弦曲线
+            if (historyPoints.length > 1) {
+                sineCtx.beginPath();
+                sineCtx.moveTo(
+                    sinePadding + historyPoints[0].x * timeScale, 
+                    historyPoints[0].y
+                );
+                
+                for (let i = 1; i < historyPoints.length; i++) {
+                    sineCtx.lineTo(
+                        sinePadding + historyPoints[i].x * timeScale, 
+                        historyPoints[i].y
+                    );
+                }
+                
+                sineCtx.strokeStyle = '#ffcc00';
+                sineCtx.lineWidth = 3;
+                sineCtx.stroke();
+            }
+            
+            // 绘制当前点
+            if (historyPoints.length > 0) {
+                const currentPoint = historyPoints[historyPoints.length - 1];
+                const canvasX = sinePadding + currentPoint.x * timeScale;
+                const canvasY = currentPoint.y;
+                
+                sineCtx.beginPath();
+                sineCtx.arc(canvasX, canvasY, 6, 0, Math.PI * 2);
+                sineCtx.fillStyle = '#ff416c';
+                sineCtx.fill();
+                
+                // 绘制连接线
+                sineCtx.beginPath();
+                sineCtx.moveTo(canvasX, canvasY);
+                sineCtx.lineTo(canvasX, sineAxisY);
+                sineCtx.setLineDash([5, 3]);
+                sineCtx.strokeStyle = 'rgba(255, 65, 108, 0.7)';
+                sineCtx.lineWidth = 1;
+                sineCtx.stroke();
+                sineCtx.setLineDash([]);
+                
+                // 显示当前时间
+                sineCtx.fillStyle = '#4fc3f7';
+                sineCtx.font = '14px Arial';
+                sineCtx.textAlign = 'left';
+                sineCtx.fillText(`t = ${currentPoint.x.toFixed(2)}`, canvasX + 10, canvasY - 10);
+            }
+        }
+        
+        // 动画循环
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            if (pauseTime) {
+                startTime += timestamp - pauseTime;
+                pauseTime = null;
+            }
+            
+            // 计算经过的时间（秒）
+            const elapsed = (timestamp - startTime) / 1000;
+            elapsedTime = elapsed;
+            
+            // 限制时间范围在0~4π
+            if (elapsedTime > maxTime) {
+                elapsedTime = 0;
+                startTime = timestamp;
+                historyPoints = []; // 重置历史点
+            }
+            
+            // 绘制圆周运动并获取当前y坐标
+            const pointY = drawCircleMotion(elapsedTime);
+            
+            // 绘制正弦波
+            drawSineWave(elapsedTime, pointY);
+            
+            // 继续动画
+            if (isPlaying) {
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+        
+        // 开始动画
+        function startAnimation() {
+            if (!isPlaying) {
+                isPlaying = true;
+                if (pauseTime) {
+                    pauseTime = null;
+                }
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+        
+        // 暂停动画
+        function pauseAnimation() {
+            isPlaying = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            pauseTime = performance.now();
+        }
+        
+        // 重置动画
+        function resetAnimation() {
+            pauseAnimation();
+            startTime = null;
+            elapsedTime = 0;
+            historyPoints = [];
+            circleCtx.clearRect(0, 0, circleCanvas.width, circleCanvas.height);
+            sineCtx.clearRect(0, 0, sineCanvas.width, sineCanvas.height);
+        }
+        
+        // 事件监听
+        startBtn.addEventListener('click', startAnimation);
+        pauseBtn.addEventListener('click', pauseAnimation);
+        resetBtn.addEventListener('click', resetAnimation);
+        
+        amplitudeSlider.addEventListener('input', function() {
+            amplitude = parseFloat(this.value);
+            amplitudeValue.textContent = amplitude.toFixed(1);
+        });
+        
+        angularVelocitySlider.addEventListener('input', function() {
+            angularVelocity = parseInt(this.value) / 10;
+            angularVelocityValue.textContent = angularVelocity.toFixed(1);
+        });
+        
+        phaseSlider.addEventListener('input', updatePhaseDisplay);
+        
+        // 初始绘制
+        drawCircleMotion(0);
+    </script>
+</body>
+</html>

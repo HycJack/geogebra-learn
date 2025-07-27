@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电池衰减闯关游戏</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #3498db);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+        }
+        
+        h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .game-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .level-info {
+            background: linear-gradient(to right, #4A00E0, #8E2DE2);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .level-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #FFD700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .level-description {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-bar {
+            flex-grow: 1;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 0 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #00F260, #0575E6);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+        }
+        
+        .level-indicator {
+            font-weight: bold;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .formula {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chart-container {
+            flex: 2;
+            min-width: 300px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05) 0%, transparent 20%);
+            z-index: 0;
+        }
+        
+        .chart-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chart-wrapper {
+            flex: 1;
+            min-height: 300px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .controls-container {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .control-panel {
+            background: linear-gradient(to right, #3494E6, #EC6EAD);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, 
+                    transparent 0%, 
+                    rgba(255,255,255,0.1) 50%, 
+                    transparent 100%);
+            z-index: 0;
+        }
+        
+        .slider-container {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #FFD700;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid white;
+        }
+        
+        .value-display {
+            font-size: 1.1rem;
+            color: white;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .battery-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .battery {
+            width: 140px;
+            height: 280px;
+            border: 10px solid rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 
+                        inset 0 0 15px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        
+        .battery::after {
+            content: '';
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .charge-level {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            transition: height 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            border-radius: 8px;
+            background: linear-gradient(to top, #00c853, #64dd17);
+        }
+        
+        .charge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            z-index: 2;
+        }
+        
+        .task-container {
+            background: linear-gradient(to right, #FF416C, #FF4B2B);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, 
+                    transparent 0%, 
+                    rgba(255,255,255,0.1) 50%, 
+                    transparent 100%);
+            z-index: 0;
+        }
+        
+        .task-title {
+            color: white;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .task-description {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+        }
+        
+        .task-content {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(5px);
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .question:last-child {
+            border-bottom: none;
+            margin-bottom: 15px;
+        }
+        
+        .question-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .option.selected {
+            background: rgba(46, 204, 113, 0.5);
+            border-color: #2ecc71;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+        }
+        
+        .option.correct {
+            background: rgba(46, 204, 113, 0.5);
+            border-color: #2ecc71;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+        }
+        
+        .option.incorrect {
+            background: rgba(231, 76, 60, 0.5);
+            border-color: #e74c3c;
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                transparent 0%, 
+                rgba(255,255,255,0.3) 50%, 
+                transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .btn:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-check {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .btn-next {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            display: none;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feedback.correct {
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .feedback.incorrect {
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .game-complete {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient to right, #4A00E0, #8E2DE2);
+            border-radius: 10px;
+            display: none;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-complete::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 30%),
+                radial-gradient(circle at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 30%);
+            z-index: 0;
+        }
+        
+        .game-complete h2 {
+            color: #FFD700;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .game-complete p {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-restart {
+            background: linear-gradient(to right, #FF416C, #FF4B2B);
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (max-width: 900px) {
+            .game-content {
+                flex-direction: column;
+            }
+            
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .level-title {
+                font-size: 1.5rem;
+            }
+            
+            .formula {
+                font-size: 1.2rem;
+            }
+            
+            .battery {
+                width: 100px;
+                height: 200px;
+            }
+            
+            .charge-text {
+                font-size: 1.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>电池衰减闯关游戏</h1>
+            <p class="subtitle">探索电池容量与充电循环次数的数学关系 - 高一幂函数与根式函数应用</p>
+        </header>
+        
+        <div class="game-content">
+            <div class="level-info">
+                <div class="level-title">第 <span id="current-level">1</span> 关：认识函数</div>
+                <div class="level-description" id="level-description">了解电池衰减函数的基本性质</div>
+                <div class="progress-container">
+                    <span>进度</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="level-indicator"><span id="completed-levels">0</span>/5</span>
+                </div>
+                <div class="formula">电池容量衰减公式：C = 100 - k√N</div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">电池容量衰减曲线</div>
+                <div class="chart-wrapper">
+                    <canvas id="batteryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="controls-container">
+                <div class="control-panel">
+                    <div class="slider-container">
+                        <label for="k-slider">衰减系数 (k):</label>
+                        <input type="range" id="k-slider" min="0.05" max="0.8" step="0.01" value="0.4">
+                        <div class="value-display">当前值: <span id="k-value">0.40</span></div>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="n-slider">充电循环次数 (N):</label>
+                        <input type="range" id="n-slider" min="0" max="2000" step="10" value="0">
+                        <div class="value-display">当前值: <span id="n-value">0</span></div>
+                    </div>
+                </div>
+                
+                <div class="control-panel">
+                    <div class="battery-container">
+                        <div class="battery">
+                            <div id="charge-level" class="charge-level"></div>
+                            <div id="charge-text" class="charge-text">100%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="task-container" id="task-container">
+            <div class="task-title">任务1：认识函数</div>
+            <div class="task-description">观察函数 C = 100 - k√N，回答以下问题：</div>
+            
+            <div class="task-content" id="task-content">
+                <div class="question">
+                    <div class="question-text">1. 这个函数中的幂函数部分是什么？它的指数是多少？</div>
+                    <div class="options-container">
+                        <div class="option" data-value="A">A. N²，指数为2</div>
+                        <div class="option" data-value="B">B. √N，指数为1/2</div>
+                        <div class="option" data-value="C">C. N⁻²，指数为-2</div>
+                        <div class="option" data-value="D">D. N³，指数为3</div>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <div class="question-text">2. 这个函数是增函数还是减函数？</div>
+                    <div class="options-container">
+                        <div class="option" data-value="A">A. 增函数</div>
+                        <div class="option" data-value="B">B. 减函数</div>
+                        <div class="option" data-value="C">C. 先增后减</div>
+                        <div class="option" data-value="D">D. 先减后增</div>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <div class="question-text">3. 当N增大时，函数值的变化速度是加快还是减慢？</div>
+                    <div class="options-container">
+                        <div class="option" data-value="A">A. 加快</div>
+                        <div class="option" data-value="B">B. 减慢</div>
+                        <div class="option" data-value="C">C. 保持不变</div>
+                        <div class="option" data-value="D">D. 先加快后减慢</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn btn-check" id="check-answer">检查答案</button>
+                <button class="btn btn-next" id="next-level">下一关</button>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+        </div>
+        
+        <div class="game-complete" id="game-complete">
+            <h2>恭喜你完成所有关卡！</h2>
+            <p>你已经掌握了电池衰减函数的所有知识点！</p>
+            <p>最终得分: <span id="final-score">100</span>/100</p>
+            <button class="btn btn-restart" id="restart-game">重新开始</button>
+        </div>
+    </div>
+    
+    <script>
+        // 游戏关卡数据
+        const levels = [
+            {
+                title: "任务1：认识函数",
+                description: "了解电池衰减函数的基本性质",
+                questions: [
+                    {
+                        question: "1. 这个函数中的幂函数部分是什么？它的指数是多少？",
+                        options: [
+                            "A. N²，指数为2",
+                            "B. √N，指数为1/2",
+                            "C. N⁻²，指数为-2",
+                            "D. N³，指数为3"
+                        ],
+                        correctAnswer: "B"
+                    },
+                    {
+                        question: "2. 这个函数是增函数还是减函数？",
+                        options: [
+                            "A. 增函数",
+                            "B. 减函数",
+                            "C. 先增后减",
+                            "D. 先减后增"
+                        ],
+                        correctAnswer: "B"
+                    },
+                    {
+                        question: "3. 当N增大时，函数值的变化速度是加快还是减慢？",
+                        options: [
+                            "A. 加快",
+                            "B. 减慢",
+                            "C. 保持不变",
+                            "D. 先加快后减慢"
+                        ],
+                        correctAnswer: "B"
+                    }
+                ],
+                k: 0.4,
+                n: 0
+            },
+            {
+                title: "任务2：计算电池容量",
+                description: "练习使用函数计算电池容量",
+                questions: [
+                    {
+                        question: "1. 当k=0.5，N=400时，电池容量C是多少？",
+                        answer: "90",
+                        partial: ["90%"]
+                    },
+                    {
+                        question: "2. 要使电池容量降至85%，需要多少次充电循环？（k=0.5）",
+                        answer: "900",
+                        partial: ["900次"]
+                    }
+                ],
+                k: 0.5,
+                n: 400
+            },
+            {
+                title: "任务3：求衰减系数",
+                description: "根据已知数据求衰减系数",
+                questions: [
+                    {
+                        question: "1. 某电池在N=625次充电后容量降至80%，求k值",
+                        answer: "0.8",
+                        partial: ["0.80"]
+                    },
+                    {
+                        question: "2. 如果希望电池在N=1600次时才降至80%，k值应为多少？",
+                        answer: "0.5",
+                        partial: ["0.50"]
+                    }
+                ],
+                k: 0.6,
+                n: 625
+            },
+            {
+                title: "任务4：不等式应用",
+                description: "解决电池寿命的实际问题",
+                questions: [
+                    {
+                        question: "1. 厂商承诺电池在500次充电循环内容量不低于85%，k应满足什么条件？(答案保留3位小数)",
+                        answer: "k≤0.671",
+                        partial: ["0.671", "小于等于0.671"]
+                    }
+                ],
+                k: 0.3,
+                n: 500
+            },
+            {
+                title: "任务5：比较不同电池",
+                description: "比较不同衰减系数的电池性能",
+                questions: [
+                    {
+                        question: "1. 比较k=0.3和k=0.5的电池在N=100次时的容量差（答案格式：x%）",
+                        answer: "2%",
+                        partial: ["2"]
+                    }
+                ],
+                k: 0.3,
+                n: 100
+            }
+        ];
+
+        // 游戏状态
+        let currentLevel = 0;
+        let score = 0;
+        const maxScore = 100;
+        const scorePerQuestion = maxScore / levels.reduce((sum, level) => sum + level.questions.length, 0);
+
+        // DOM元素
+        const currentLevelEl = document.getElementById('current-level');
+        const levelDescriptionEl = document.getElementById('level-description');
+        const progressFillEl = document.getElementById('progress-fill');
+        const completedLevelsEl = document.getElementById('completed-levels');
+        const taskTitleEl = document.querySelector('.task-title');
+        const taskDescriptionEl = document.querySelector('.task-description');
+        const taskContentEl = document.getElementById('task-content');
+        const checkAnswerBtn = document.getElementById('check-answer');
+        const nextLevelBtn = document.getElementById('next-level');
+        const feedbackEl = document.getElementById('feedback');
+        const gameCompleteEl = document.getElementById('game-complete');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartGameBtn = document.getElementById('restart-game');
+
+        // 图表相关元素
+        const kSlider = document.getElementById('k-slider');
+        const kValue = document.getElementById('k-value');
+        const nSlider = document.getElementById('n-slider');
+        const nValue = document.getElementById('n-value');
+        const chargeLevelEl = document.getElementById('charge-level');
+        const chargeTextEl = document.getElementById('charge-text');
+        
+        // 初始化图表
+        const ctx = document.getElementById('batteryChart').getContext('2d');
+        let batteryChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 21}, (_, i) => i * 100),
+                datasets: [{
+                    label: '电池容量百分比 (%)',
+                    data: [],
+                    borderColor: '#FFD700',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#FFA500',
+                    fill: true,
+                    tension: 0.2
+                }, {
+                    label: '寿命终点 (80%)',
+                    data: Array(21).fill(80),
+                    borderColor: '#e74c3c',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '电池容量衰减曲线 C = 100 - k√N (0 ≤ N ≤ 2000)',
+                        font: {
+                            size: 16,
+                            color: '#FFFFFF'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `容量: ${context.parsed.y.toFixed(1)}%`;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 12,
+                                color: '#FFFFFF'
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '充电循环次数 (N)',
+                            font: {
+                                size: 12,
+                                weight: 'bold',
+                                color: '#FFFFFF'
+                            }
+                        },
+                        min: 0,
+                        max: 2000,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10,
+                            color: '#FFFFFF'
+                        }
+                    },
+                    y: {
+                        min: 75,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '剩余容量 (%)',
+                            font: {
+                                size: 12,
+                                weight: 'bold',
+                                color: '#FFFFFF'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            stepSize: 5,
+                            color: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 计算电池容量函数
+        function calculateCapacity(k, n) {
+            return 100 - k * Math.sqrt(n);
+        }
+
+        // 更新图表数据
+        function updateChartData(k) {
+            const newData = [];
+            for (let n = 0; n <= 2000; n += 100) {
+                newData.push({
+                    x: n,
+                    y: calculateCapacity(k, n)
+                });
+            }
+            
+            batteryChart.data.datasets[0].data = newData;
+            
+            // 清除之前的标记点
+            while (batteryChart.data.datasets.length > 2) {
+                batteryChart.data.datasets.pop();
+            }
+            
+            batteryChart.update();
+        }
+
+        // 更新电池图形
+        function updateBatteryGraphic(n, k) {
+            const capacity = Math.max(0, calculateCapacity(k, n));
+            const height = Math.max(0, Math.min(100, capacity));
+            
+            chargeLevelEl.style.height = `${height}%`;
+            chargeTextEl.textContent = `${capacity.toFixed(1)}%`;
+            
+            // 根据电量改变颜色
+            if (capacity > 70) {
+                chargeLevelEl.style.background = 'linear-gradient(to top, #00c853, #64dd17)';
+            } else if (capacity > 40) {
+                chargeLevelEl.style.background = 'linear-gradient(to top, #ffd600, #ffab00)';
+            } else {
+                chargeLevelEl.style.background = 'linear-gradient(to top, #ff3d00, #ff6d00)';
+            }
+        }
+
+        // 添加标记点到图表
+        function addMarkerToChart(n, k) {
+            const capacity = calculateCapacity(k, n);
+            
+            // 确保只有一个标记点
+            if (batteryChart.data.datasets.length > 2) {
+                batteryChart.data.datasets.pop();
+            }
+            
+            batteryChart.data.datasets.push({
+                label: `当前: N=${n}, C=${capacity.toFixed(1)}%`,
+                data: [{x: n, y: capacity}],
+                borderColor: '#9c27b0',
+                backgroundColor: '#9c27b0',
+                pointRadius: 8,
+                pointStyle: 'rectRot',
+                showLine: false
+            });
+            
+            batteryChart.update();
+        }
+
+        // 加载关卡
+        function loadLevel(levelIndex) {
+            const level = levels[levelIndex];
+            
+            // 更新关卡信息
+            currentLevelEl.textContent = levelIndex + 1;
+            levelDescriptionEl.textContent = level.description;
+            taskTitleEl.textContent = level.title;
+            taskDescriptionEl.textContent = "观察函数 C = 100 - k√N，回答以下问题：";
+            
+            // 更新进度条
+            progressFillEl.style.width = `${(levelIndex / levels.length) * 100}%`;
+            completedLevelsEl.textContent = levelIndex;
+            
+            // 设置滑块值
+            kSlider.value = level.k;
+            nSlider.value = level.n;
+            kValue.textContent = level.k.toFixed(2);
+            nValue.textContent = level.n;
+            
+            // 更新图表和电池显示
+            updateChartData(level.k);
+            updateBatteryGraphic(level.n, level.k);
+            addMarkerToChart(level.n, level.k);
+            
+            // 构建问题列表（第一关使用选择题）
+            if (levelIndex === 0) {
+                taskContentEl.innerHTML = '';
+                level.questions.forEach((q, qIndex) => {
+                    const questionEl = document.createElement('div');
+                    questionEl.className = 'question';
+                    questionEl.innerHTML = `
+                        <div class="question-text">${q.question}</div>
+                        <div class="options-container">
+                            ${q.options.map((option, index) => 
+                                `<div class="option" data-value="${String.fromCharCode(65 + index)}">${option}</div>`
+                            ).join('')}
+                        </div>
+                    `;
+                    taskContentEl.appendChild(questionEl);
+                });
+            } else {
+                // 其他关卡保持文本输入
+                taskContentEl.innerHTML = '';
+                level.questions.forEach((q, i) => {
+                    const questionEl = document.createElement('p');
+                    questionEl.textContent = q.question;
+                    questionEl.className = 'question-text';
+                    taskContentEl.appendChild(questionEl);
+                    
+                    const inputEl = document.createElement('input');
+                    inputEl.type = 'text';
+                    inputEl.className = 'answer-input';
+                    inputEl.id = `answer${i}`;
+                    inputEl.placeholder = '请输入答案';
+                    taskContentEl.appendChild(inputEl);
+                });
+            }
+            
+            // 重置按钮和反馈
+            nextLevelBtn.style.display = 'none';
+            feedbackEl.style.display = 'none';
+            checkAnswerBtn.style.display = 'block';
+            
+            // 添加选项选择事件监听器（仅第一关）
+            if (levelIndex === 0) {
+                document.querySelectorAll('.option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        const question = this.closest('.question');
+                        question.querySelectorAll('.option').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                    });
+                });
+            }
+        }
+
+        // 检查答案（第一关特殊处理）
+        function checkAnswers() {
+            const level = levels[currentLevel];
+            let allCorrect = true;
+            let feedbackText = '';
+            
+            if (currentLevel === 0) {
+                // 第一关选择题检查
+                const questions = document.querySelectorAll('.question');
+                
+                questions.forEach((question, qIndex) => {
+                    const selectedOption = question.querySelector('.option.selected');
+                    
+                    if (!selectedOption) {
+                        allCorrect = false;
+                        feedbackText += `<p>问题 ${qIndex+1}: 请选择一个答案</p>`;
+                        return;
+                    }
+                    
+                    const userAnswer = selectedOption.dataset.value;
+                    const correctAnswer = level.questions[qIndex].correctAnswer;
+                    
+                    if (userAnswer === correctAnswer) {
+                        selectedOption.classList.add('correct');
+                        score += scorePerQuestion;
+                    } else {
+                        allCorrect = false;
+                        selectedOption.classList.add('incorrect');
+                        
+                        // 标记正确答案
+                        const options = question.querySelectorAll('.option');
+                        options.forEach(opt => {
+                            if (opt.dataset.value === correctAnswer) {
+                                opt.classList.add('correct');
+                            }
+                        });
+                        
+                        feedbackText += `<p>问题 ${qIndex+1}: 不正确。正确答案是: ${correctAnswer}</p>`;
+                    }
+                });
+            } else {
+                // 其他关卡文本输入检查
+                level.questions.forEach((q, i) => {
+                    const answerInput = document.getElementById(`answer${i}`);
+                    const userAnswer = answerInput.value.trim().toLowerCase();
+                    const correctAnswer = q.answer.toLowerCase();
+                    
+                    // 检查答案
+                    if (userAnswer === correctAnswer || 
+                        (q.partial && q.partial.some(p => userAnswer.includes(p.toLowerCase())))) {
+                        answerInput.style.borderColor = '#28a745';
+                        score += scorePerQuestion;
+                    } else {
+                        answerInput.style.borderColor = '#dc3545';
+                        allCorrect = false;
+                        feedbackText += `<p>问题 ${i+1}: 不正确。正确答案应该是: ${q.answer}</p>`;
+                    }
+                });
+            }
+            
+            // 显示反馈
+            if (allCorrect) {
+                feedbackEl.className = 'feedback correct';
+                feedbackEl.innerHTML = '<p>🎉🎉 全部正确！做得很好！</p>';
+                nextLevelBtn.style.display = 'block';
+                checkAnswerBtn.style.display = 'none';
+                
+                // 添加庆祝效果
+                const container = document.querySelector('.game-container');
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    container.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }
+            } else {
+                feedbackEl.className = 'feedback incorrect';
+                feedbackEl.innerHTML = feedbackText;
+            }
+            
+            feedbackEl.style.display = 'block';
+        }
+
+        // 下一关
+        function nextLevel() {
+            currentLevel++;
+            
+            if (currentLevel < levels.length) {
+                loadLevel(currentLevel);
+            } else {
+                // 游戏完成
+                document.getElementById('task-container').style.display = 'none';
+                gameCompleteEl.style.display = 'block';
+                finalScoreEl.textContent = Math.round(score);
+            }
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            currentLevel = 0;
+            score = 0;
+            document.getElementById('task-container').style.display = 'block';
+            gameCompleteEl.style.display = 'none';
+            loadLevel(currentLevel);
+        }
+
+        // 事件监听
+        checkAnswerBtn.addEventListener('click', checkAnswers);
+        nextLevelBtn.addEventListener('click', nextLevel);
+        restartGameBtn.addEventListener('click', restartGame);
+        
+        kSlider.addEventListener('input', function() {
+            const k = parseFloat(this.value);
+            kValue.textContent = k.toFixed(2);
+            updateChartData(k);
+            updateBatteryGraphic(parseInt(nSlider.value), k);
+            addMarkerToChart(parseInt(nSlider.value), k);
+        });
+        
+        nSlider.addEventListener('input', function() {
+            const n = parseInt(this.value);
+            nValue.textContent = n;
+            updateBatteryGraphic(n, parseFloat(kSlider.value));
+            addMarkerToChart(n, parseFloat(kSlider.value));
+        });
+
+        // 初始化游戏
+        loadLevel(currentLevel);
+        
+        // 添加一些动画效果
+        const confettiCSS = document.createElement('style');
+        confettiCSS.textContent = `
+            @keyframes confettiFall {
+                0% { 
+                    transform: translateY(-100px) rotate(0deg); 
+                    opacity: 1;
+                }
+                100% { 
+                    transform: translateY(100vh) rotate(360deg); 
+                    opacity: 0;
+                }
+            }
+            
+            .confetti {
+                position: fixed;
+                top: -20px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                animation: confettiFall 3s linear forwards;
+                z-index: 1000;
+            }
+        `;
+        document.head.appendChild(confettiCSS);
+    </script>
+</body>
+</html>

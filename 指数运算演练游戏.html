@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>指数运算学习系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        h1 {
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .tab.active {
+            background-color: white;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+        }
+        .difficulty-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .difficulty-btn {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #e0e0e0;
+        }
+        .difficulty-btn.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .question {
+            font-size: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .option {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            min-width: 80px;
+        }
+        .feedback {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        .feedback.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .knowledge-content {
+            padding: 20px;
+        }
+        .knowledge-content h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .example {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .restart-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 25px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>指数运算学习系统</h1>
+        </div>
+        
+        <div class="tab-container">
+            <button class="tab active" onclick="openTab('knowledge')">知识讲解</button>
+            <button class="tab" onclick="openTab('practice')">练习模式</button>
+        </div>
+        
+        <!-- 知识讲解 -->
+        <div id="knowledge" class="content">
+            <div class="knowledge-content">
+                <h2>什么是指数运算？</h2>
+                <p>指数运算表示一个数（底数）乘以自身若干次（指数），记作 aⁿ，其中a是底数，n是指数。</p>
+                
+                <div class="example">
+                    <p><strong>示例：</strong></p>
+                    <p>2³ = 2 × 2 × 2 = 8</p>
+                    <p>5² = 5 × 5 = 25</p>
+                </div>
+                
+                <h2>指数运算法则</h2>
+                
+                <div class="example">
+                    <p><strong>1. 同底数相乘：</strong></p>
+                    <p>aᵐ × aⁿ = aᵐ⁺ⁿ</p>
+                    <p>示例：2³ × 2² = 2⁵ = 32</p>
+                    
+                    <p><strong>2. 同底数相除：</strong></p>
+                    <p>aᵐ ÷ aⁿ = aᵐ⁻ⁿ</p>
+                    <p>示例：5⁴ ÷ 5² = 5² = 25</p>
+                    
+                    <p><strong>3. 幂的幂：</strong></p>
+                    <p>(aᵐ)ⁿ = aᵐⁿ</p>
+                    <p>示例：(3²)³ = 3⁶ = 729</p>
+                    
+                    <p><strong>4. 积的幂：</strong></p>
+                    <p>(a × b)ⁿ = aⁿ × bⁿ</p>
+                    <p>示例：(2×3)² = 2²×3² = 4×9 = 36</p>
+                    
+                    <p><strong>5. 幂的积：</strong></p>
+                    <p>(aᵐ × bⁿ)ᵖ = aᵐᵖ × bⁿᵖ</p>
+                    <p>示例：(2²×3³)² = 2⁴×3⁶ = 16×729 = 11664</p>
+                </div>
+                
+                <h2>特殊指数</h2>
+                <div class="example">
+                    <p>a⁰ = 1 （a ≠ 0）</p>
+                    <p>a⁻ⁿ = 1 / aⁿ</p>
+                    <p>示例：7⁰ = 1, 2⁻³ = 1/8</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 练习模式 -->
+        <div id="practice" class="content" style="display:none;">
+            <h2>练习模式</h2>
+            <p>选择适合你的难度级别，开始练习指数运算吧！</p>
+            
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" onclick="setDifficulty('easy')">简单</button>
+                <button class="difficulty-btn" onclick="setDifficulty('medium')">中等</button>
+                <button class="difficulty-btn active" onclick="setDifficulty('hard')">困难</button>
+            </div>
+            
+            <div id="question" class="question">
+                <!-- 题目由JS动态生成 -->
+            </div>
+            
+            <div id="options" class="options">
+                <!-- 选项由JS动态生成 -->
+            </div>
+            
+            <div id="feedback" class="feedback">
+                <!-- 反馈信息 -->
+            </div>
+            
+            <button id="restartBtn" class="restart-btn" onclick="restartPractice()">再做一题</button>
+        </div>
+    </div>
+
+    <script>
+        // 题目数据
+        const questions = {
+            easy: [
+                {
+                    question: "计算：2³ × 2²",
+                    options: ["2⁵", "2⁶", "4⁵", "4⁶"],
+                    answer: "2⁵"
+                },
+                {
+                    question: "计算：5⁴ ÷ 5²",
+                    options: ["5²", "5⁶", "25²", "10²"],
+                    answer: "5²"
+                },
+                {
+                    question: "计算：3³ × 3²",
+                    options: ["3⁵", "3⁶", "9⁵", "9³"],
+                    answer: "3⁵"
+                },
+                {
+                    question: "计算：4⁵ ÷ 4³",
+                    options: ["4²", "4⁸", "16", "1"],
+                    answer: "4²"
+                },
+                {
+                    question: "计算：7⁰ × 7³",
+                    options: ["7³", "7⁰", "0", "1"],
+                    answer: "7³"
+                }
+            ],
+            medium: [
+                {
+                    question: "计算：(3²)³",
+                    options: ["3⁵", "3⁶", "9³", "9⁶"],
+                    answer: "3⁶"
+                },
+                {
+                    question: "计算：4³ ÷ 4⁻²",
+                    options: ["4", "4⁵", "4⁻⁵", "16"],
+                    answer: "4⁵"
+                },
+                {
+                    question: "计算：6⁻² × 6⁴",
+                    options: ["6²", "6⁻⁸", "6⁻⁶", "36"],
+                    answer: "6²"
+                },
+                {
+                    question: "计算：(5⁻¹)²",
+                    options: ["5⁻²", "5²", "25", "1/5"],
+                    answer: "5⁻²"
+                },
+                {
+                    question: "计算：8³ ÷ 8³",
+                    options: ["8⁰", "8⁶", "0", "64"],
+                    answer: "8⁰"
+                }
+            ],
+            hard: [
+                {
+                    question: "计算：(5³ × 5⁻⁵) ÷ (5² × 5⁻⁴)",
+                    options: ["1", "5⁻²", "5²", "5⁴"],
+                    answer: "1"
+                },
+                {
+                    question: "计算：(2⁴ × 3³) ÷ (2² × 3²)",
+                    options: ["2²×3", "2²×3²", "2⁶×3", "2×3⁵"],
+                    answer: "2²×3"
+                },
+                {
+                    question: "计算：7⁻³ × 7⁵ ÷ 7²",
+                    options: ["7⁰", "7⁻¹⁰", "7¹⁰", "7"],
+                    answer: "7⁰"
+                },
+                {
+                    question: "计算：(a² × b³)²",
+                    options: ["a⁴b⁶", "a²b⁶", "a⁴b⁵", "a²b⁵"],
+                    answer: "a⁴b⁶"
+                },
+                {
+                    question: "计算：(x³ × y⁻²)² ÷ (x × y⁻¹)³",
+                    options: ["x³y⁻¹", "x³y", "x⁹y⁻⁷", "x⁶y⁻¹²"],
+                    answer: "x³y⁻¹"
+                },
+                {
+                    question: "计算：(m²n³)³ ÷ (m n²)²",
+                    options: ["m⁴n⁵", "m⁵n⁵", "m³n⁵", "m⁴n⁷"],
+                    answer: "m⁴n⁵"
+                }
+            ]
+        };
+
+        let currentDifficulty = 'hard';
+        let currentQuestionIndex = 0;
+        let currentQuestions = questions.hard;
+
+        // 切换标签页
+        function openTab(tabName) {
+            // 隐藏所有内容
+            document.querySelectorAll('.content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // 取消所有标签的活动状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的内容
+            document.getElementById(tabName).style.display = 'block';
+            
+            // 设置选中标签的活动状态
+            event.target.classList.add('active');
+            
+            // 如果是练习模式，初始化题目
+            if (tabName === 'practice') {
+                loadQuestion();
+            }
+        }
+        
+        // 设置难度
+        function setDifficulty(level) {
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentDifficulty = level;
+            currentQuestions = questions[level];
+            currentQuestionIndex = 0;
+            loadQuestion();
+        }
+        
+        // 加载题目
+        function loadQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            const questionElement = document.getElementById('question');
+            const optionsElement = document.getElementById('options');
+            const feedbackElement = document.getElementById('feedback');
+            const restartBtn = document.getElementById('restartBtn');
+            
+            // 重置状态
+            feedbackElement.style.display = 'none';
+            restartBtn.style.display = 'none';
+            optionsElement.innerHTML = '';
+            
+            // 设置题目
+            questionElement.textContent = question.question;
+            
+            // 添加选项
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, question.answer);
+                optionsElement.appendChild(button);
+            });
+        }
+        
+        // 检查答案
+        function checkAnswer(selectedAnswer, correctAnswer) {
+            const feedback = document.getElementById('feedback');
+            const restartBtn = document.getElementById('restartBtn');
+            const options = document.querySelectorAll('.option');
+            
+            // 禁用所有选项按钮
+            options.forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            if (selectedAnswer === correctAnswer) {
+                feedback.textContent = '正确！';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = `错误！正确答案是 ${correctAnswer}`;
+                feedback.className = 'feedback error';
+            }
+            
+            feedback.style.display = 'block';
+            restartBtn.style.display = 'block';
+        }
+        
+        // 重新开始练习
+        function restartPractice() {
+            // 循环到下一题
+            currentQuestionIndex = (currentQuestionIndex + 1) % currentQuestions.length;
+            loadQuestion();
+        }
+
+        // 初始化练习模式题目
+        window.onload = function() {
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>

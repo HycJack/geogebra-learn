@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>三角形探秘之旅（完整五关+修复问题+新增知识点）</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#333}
+.container{max-width:1000px;margin:0 auto;padding:20px}
+.header{text-align:center;color:#fff;margin-bottom:20px}
+h1{font-size:28px;margin-bottom:8px}
+.nav-tabs{display:flex;justify-content:center;margin-bottom:25px;background:rgba(255,255,255,.25);border-radius:50px;padding:5px}
+.nav-tab{padding:10px 28px;color:#fff;border-radius:50px;cursor:pointer;transition:all .3s;margin:0 5px;font-size:16px}
+.nav-tab.active{background:#fff;color:#667eea;font-weight:bold}
+.content-panel{background:#fff;border-radius:15px;padding:30px;display:none}
+.content-panel.active{display:block}
+h2{color:#667eea;margin-bottom:15px;text-align:center}
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:20px 0}
+.concept-card{background:#f8f9fa;border-radius:10px;padding:20px;border-left:5px solid #667eea}
+.concept-title{color:#667eea;font-size:20px;margin-bottom:10px;display:flex;align-items:center}
+.icon{margin-right:8px;font-size:22px}
+.formula-box{background:#eef2ff;padding:12px;border-radius:6px;margin:10px 0;font-family:"Times New Roman",serif}
+.example-box{background:#fff3cd;border-radius:8px;padding:20px;margin:20px 0;border-left:4px solid #ffc107}
+canvas{border:1px solid #ccc;border-radius:8px;display:block;margin:20px auto;background:#fff}
+.start-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:12px 40px;border-radius:30px;font-size:18px;cursor:pointer;margin:20px auto;display:block;transition:.3s}
+.start-btn:hover{transform:scale(1.05)}
+.level-card{display:none}.level-card.active{display:block}
+.level-title{display:flex;align-items:center;color:#667eea;font-size:22px;margin-bottom:15px}
+.level-badge{background:#667eea;color:#fff;padding:4px 12px;border-radius:15px;margin-right:12px;font-size:14px}
+.game-section{background:#f9f9f9;border-radius:10px;padding:20px;margin-top:20px}
+.question{background:#fff;padding:20px;border-radius:8px;margin-bottom:15px}
+.options{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.option{padding:10px;border:2px solid #667eea;border-radius:5px;cursor:pointer;text-align:center;transition:.3s}
+.option:hover{background:#667eea;color:#fff}
+.option.correct{background:#4caf50 !important;color:#fff !important;border-color:#4caf50 !important}
+.option.wrong{background:#f44336 !important;color:#fff !important;border-color:#f44336 !important}
+.score{text-align:center;font-size:18px;color:#667eea;margin:10px 0}
+.next-btn{background:#667eea;color:#fff;border:none;padding:8px 30px;border-radius:25px;cursor:pointer;font-size:16px;display:block;margin:15px auto}
+.next-btn:hover{background:#764ba2}
+.progress-bar{background:#e0e0e0;border-radius:10px;height:10px;margin:10px 0}
+.progress-fill{background:#667eea;height:100%;border-radius:10px;transition:width .3s}
+.feedback{display:none;color:#333;font-size:16px;margin-top:10px;padding:10px;border-radius:5px}
+.feedback.correct{background:#e8f5e9}
+.feedback.wrong{background:#ffebee}
+.reset-btn{background:#ff9800;color:#fff;border:none;padding:8px 30px;border-radius:25px;cursor:pointer;font-size:16px;display:block;margin:15px auto}
+.reset-btn:hover{background:#f57c00}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>三角形探秘之旅</h1>
+        <p>知识学习 → 闯关挑战 → 掌握应用</p>
+    </div>
+
+    <!-- 导航 -->
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="showTab('learn')">知识学习</div>
+        <div class="nav-tab" onclick="showTab('game')">闯关游戏</div>
+    </div>
+
+    <!-- ================= 知识学习面板 ================= -->
+    <div class="content-panel active" id="learn-panel">
+        <h2>📚 核心概念预习</h2>
+        <div class="concept-grid">
+            <div class="concept-card"><div class="concept-title"><span class="icon">🔺</span>相似三角形</div><p>对应角相等，对应边成比例的两个三角形。</p><div class="formula-box">比例关系：\(\dfrac{a}{a'}=\dfrac{b}{b'}=\dfrac{c}{c'}=k\)</div></div>
+            <div class="concept-card"><div class="concept-title"><span class="icon">📐</span>勾股定理</div><p>直角三角形两直角边的平方和等于斜边平方。</p><div class="formula-box">\(a^2+b^2=c^2\)</div></div>
+            <div class="concept-card"><div class="concept-title"><span class="icon">📊</span>锐角三角函数</div><div class="formula-box">\(\sin\theta=\dfrac{对}{斜}\)<br>\(\cos\theta=\dfrac{邻}{斜}\)<br>\(\tan\theta=\dfrac{对}{邻}\)</div></div>
+            <div class="concept-card"><div class="concept-title"><span class="icon">📏</span>大地测量应用</div><div class="formula-box">高度 = 基线 × tan(仰角)</div></div>
+            <div class="concept-card"><div class="concept-title"><span class="icon">🔢</span>三角恒等式</div><p>在直角三角形中，\(\sin^2\theta + \cos^2\theta = 1\)。与勾股定理相关：当斜边为1时，\(\sin\theta\) 和 \(\cos\theta\) 分别为两直角边，满足 \(a^2 + b^2 = c^2\)。</p><div class="formula-box">\(\sin^2\theta + \cos^2\theta = 1\)</div></div>
+        </div>
+
+        <!-- 例题1：勾股定理 -->
+        <div class="example-box">
+            <h3>例题1：勾股定理应用</h3>
+            <p>已知直角三角形两直角边分别为 <strong>6 cm</strong> 和 <strong>8 cm</strong>，求斜边长度。</p>
+            <div class="formula-box">解：\(c=\sqrt{6^2+8^2}=10\text{ cm}\)</div>
+            <canvas id="ex1-canvas" width="360" height="200"></canvas>
+            <button class="start-btn" onclick="animateEx1()">重画示意图</button>
+        </div>
+
+        <!-- 例题2：大地测量 -->
+        <div class="example-box">
+            <h3>例题2：利用三角函数测楼高</h3>
+            <p>小明在距大楼底部 <strong>50 m</strong> 处测得楼顶仰角 <strong>30°</strong>，求大楼高度。</p>
+            <div class="formula-box">解：\(h=50\tan30^\circ\approx28.87\text{ m}\)</div>
+            <canvas id="ex2-canvas" width="360" height="200"></canvas>
+            <button class="start-btn" onclick="animateEx2()">重画示意图</button>
+        </div>
+        <button class="start-btn" onclick="startGame()">我已掌握，开始闯关！</button>
+    </div>
+
+    <!-- ================= 闯关游戏面板 ================= -->
+    <div class="content-panel" id="game-panel">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <!-- 第1关：相似三角形 -->
+        <div class="level-card active" id="level1">
+            <div class="level-title"><span class="level-badge">第1关</span>相似三角形的奥秘</div>
+            <canvas id="canvas1" width="360" height="200"></canvas>
+            <div class="game-section">
+                <div class="question">
+                    已知两相似三角形，第一组边长为 2,3,4 cm，第二组最短边为 4 cm，求其余两边。
+                    <div class="options">
+                        <div class="option" data-val="6,8">6 cm, 8 cm</div>
+                        <div class="option" data-val="5,7">5 cm, 7 cm</div>
+                        <div class="option" data-val="8,10">8 cm, 10 cm</div>
+                        <div class="option" data-val="4,6">4 cm, 6 cm</div>
+                    </div>
+                    <div class="feedback" id="feedback1"></div>
+                </div>
+                <div class="score">得分：<span id="score1">0</span></div>
+                <button class="next-btn" onclick="showLevel(2)">下一关</button>
+            </div>
+        </div>
+
+        <!-- 第2关：勾股定理 -->
+        <div class="level-card" id="level2">
+            <div class="level-title"><span class="level-badge">第2关</span>勾股定理实战</div>
+            <canvas id="canvas2" width="360" height="200"></canvas>
+            <div class="game-section">
+                <div class="question">
+                    直角边为 6 cm 与 8 cm 时，斜边长为多少？
+                    <div class="options">
+                        <div class="option" data-val="10">10 cm</div>
+                        <div class="option" data-val="12">12 cm</div>
+                        <div class="option" data-val="14">14 cm</div>
+                        <div class="option" data-val="9">9 cm</div>
+                    </div>
+                    <div class="feedback" id="feedback2"></div>
+                </div>
+                <div class="score">得分：<span id="score2">0</span></div>
+                <button class="next-btn" onclick="showLevel(3)">下一关</button>
+            </div>
+        </div>
+
+        <!-- 第3关：锐角三角函数 -->
+        <div class="level-card" id="level3">
+            <div class="level-title"><span class="level-badge">第3关</span>锐角三角函数</div>
+            <canvas id="canvas3" width="360" height="200"></canvas>
+            <div class="game-section">
+                <div class="question">
+                    斜边 10 cm，角 30° 时的对边长度为？
+                    <div class="options">
+                        <div class="option" data-val="5">5 cm</div>
+                        <div class="option" data-val="5√3">\(5\sqrt3\) cm</div>
+                        <div class="option" data-val="8.66">8.66 cm</div>
+                        <div class="option" data-val="10">10 cm</div>
+                    </div>
+                    <div class="feedback" id="feedback3"></div>
+                </div>
+                <div class="score">得分：<span id="score3">0</span></div>
+                <button class="next-btn" onclick="showLevel(4)">下一关</button>
+            </div>
+        </div>
+
+        <!-- 第4关：综合测量 -->
+        <div class="level-card" id="level4">
+            <div class="level-title"><span class="level-badge">第4关</span>综合测量挑战</div>
+            <canvas id="canvas4" width="360" height="200"></canvas>
+            <div class="game-section">
+                <div class="question">
+                    某楼影长 50 m，同时 1 m 杆影长 0.8 m，求楼高。
+                    <div class="options">
+                        <div class="option" data-val="62.5">62.5 m</div>
+                        <div class="option" data-val="40">40 m</div>
+                        <div class="option" data-val="50">50 m</div>
+                        <div class="option" data-val="80">80 m</div>
+                    </div>
+                    <div class="feedback" id="feedback4"></div>
+                </div>
+                <div class="score">得分：<span id="score4">0</span></div>
+                <button class="next-btn" onclick="showLevel(5)">下一关</button>
+            </div>
+        </div>
+
+        <!-- 第5关：大边对大角 -->
+        <div class="level-card" id="level5">
+            <div class="level-title"><span class="level-badge">第5关</span>大边对大角</div>
+            <canvas id="canvas5" width="360" height="200"></canvas>
+            <div class="game-section">
+                <div class="question">
+                    三角形边长为 5 cm, 7 cm, 8 cm，哪个角最大？
+                    <div class="options">
+                        <div class="option" data-val="82">对边 8 cm 的角（约82°）</div>
+                        <div class="option" data-val="56">对边 7 cm 的角（约56°）</div>
+                        <div class="option" data-val="42">对边 5 cm 的角（约42°）</div>
+                        <div class="option" data-val="60">所有角相等（60°）</div>
+                    </div>
+                    <div class="feedback" id="feedback5"></div>
+                </div>
+                <div class="score">得分：<span id="score5">0</span></div>
+                <div id="final-result" style="font-size:20px;text-align:center;color:#667eea;margin-top:10px"></div>
+                <button class="reset-btn" onclick="resetGame()">重新开始</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ===== 通用 ===== */
+const $=id=>document.getElementById(id);
+function showTab(t){
+    [...document.querySelectorAll('.nav-tab')].forEach(n=>n.classList.remove('active'));
+    [...document.querySelectorAll('.content-panel')].forEach(p=>p.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${t}')"]`).classList.add('active');
+    $(t+'-panel').classList.add('active');
+}
+function startGame(){
+    showTab('game');
+    showLevel(1);
+    updateProgress(1);
+}
+function showLevel(n){
+    [...document.querySelectorAll('.level-card')].forEach(c=>c.classList.remove('active'));
+    $(`level${n}`).classList.add('active');
+    drawGameCanvas(n);
+    updateProgress(n);
+}
+function updateProgress(level){
+    const progress=(level-1)/5*100;
+    $('progress-fill').style.width=`${progress}%`;
+}
+function resetGame(){
+    [1,2,3,4,5].forEach(i=>{
+        $(`score${i}`).textContent='0';
+        $(`score${i}`).style.color='#667eea';
+        $(`feedback${i}`).style.display='none';
+        $(`level${i}`).querySelectorAll('.option').forEach(o=>{
+            o.classList.remove('correct','wrong');
+            o.style.pointerEvents='auto';
+            o.style.background=''; // Reset background
+            o.style.color=''; // Reset color
+            o.style.borderColor=''; // Reset border
+        });
+    });
+    $('final-result').innerHTML='';
+    showLevel(1);
+}
+
+/* ========= 知识主页例题绘图 ========= */
+function animateEx1(){
+    const c=$('ex1-canvas'),ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    let progress=0;
+    function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.strokeStyle='#667eea';ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.moveTo(60,160);
+        ctx.lineTo(60,160-progress*100);
+        ctx.lineTo(60+progress*120,160);
+        ctx.closePath();
+        ctx.stroke();
+        if(progress>=1){
+            ctx.beginPath();ctx.moveTo(70,150);ctx.lineTo(70,160);ctx.lineTo(60,150);ctx.stroke();
+            ctx.fillStyle='#333';ctx.font='16px Arial';
+            ctx.fillText('6 cm',30,110);ctx.fillText('8 cm',115,175);ctx.fillText('10 cm',120,110);
+        }
+        progress+=0.05;
+        if(progress<=1)requestAnimationFrame(draw);
+    }
+    draw();
+}
+function animateEx2(){
+    const c=$('ex2-canvas'),ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    let progress=0;
+    function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.beginPath();ctx.moveTo(0,160);ctx.lineTo(c.width*progress,160);ctx.stroke();
+        ctx.fillStyle='#667eea';ctx.fillRect(220,40,30,120*progress);
+        ctx.beginPath();ctx.moveTo(40,160);ctx.lineTo(220*progress,40*progress);ctx.strokeStyle='#f44336';ctx.stroke();
+        if(progress>=1){
+            ctx.beginPath();ctx.arc(40,160,30,-Math.PI/2,-Math.PI/6,true);ctx.stroke();
+            ctx.fillStyle='#333';ctx.font='14px Arial';
+            ctx.fillText('50 m',120,175);ctx.fillText('30°',60,140);ctx.fillText('h=?',255,90);
+        }
+        progress+=0.05;
+        if(progress<=1)requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+/* ========= 游戏关卡绘图 ========= */
+function drawGameCanvas(n){
+    const c=$(`canvas${n}`);if(!c)return;
+    const ctx=c.getContext('2d');c.width=360;c.height=200;
+    ctx.clearRect(0,0,360,200);
+    ctx.lineWidth=3;ctx.strokeStyle='#667eea';ctx.fillStyle='#333';ctx.font='14px Arial';
+    switch(n){
+        case 1:
+            ctx.beginPath();ctx.moveTo(60,160);ctx.lineTo(120,60);ctx.lineTo(180,160);ctx.closePath();ctx.stroke();
+            ctx.strokeStyle='#764ba2';
+            ctx.beginPath();ctx.moveTo(220,160);ctx.lineTo(280,100);ctx.lineTo(340,160);ctx.closePath();ctx.stroke();
+            ctx.fillText('2 cm',80,110);ctx.fillText('3 cm',150,170);ctx.fillText('4 cm',120,80);
+            ctx.fillText('4 cm,?,?',280,120);
+            break;
+        case 2:
+            ctx.beginPath();ctx.moveTo(60,160);ctx.lineTo(60,60);ctx.lineTo(180,160);ctx.closePath();ctx.stroke();
+            ctx.beginPath();ctx.moveTo(70,150);ctx.lineTo(70,160);ctx.lineTo(60,150);ctx.stroke();
+            ctx.fillText('6 cm',30,110);ctx.fillText('8 cm',115,175);ctx.fillText('? cm',120,110);
+            break;
+     case 3:
+    ctx.strokeStyle = '#667eea';
+    ctx.lineWidth = 3;
+
+    /* 30°-60°-90° 标准直角三角形
+       邻边 : 对边 : 斜边 = √3 : 1 : 2
+       取比例 5√3 ≈ 8.66  | 5 | 10
+    */
+    const OX = 60, OY = 160;                 // 直角顶点
+    const adj = 5 * Math.sqrt(3) * 12;     // 邻边长度 ≈ 8.66 * 12 ≈ 104
+    const opp = 5 * 12;                    // 对边长度 = 60
+    const hyp = 10 * 12;                   // 斜边长度 = 120
+
+    ctx.beginPath();
+    ctx.moveTo(OX, OY);                    // 直角点
+    ctx.lineTo(OX, OY - adj);              // 邻边（向上）
+    ctx.lineTo(OX + opp, OY);              // 对边（向右）
+    ctx.closePath();                       // 斜边
+    ctx.stroke();
+
+    /* 直角标记 */
+    ctx.beginPath();
+    ctx.moveTo(OX + 10, OY - 10);
+    ctx.lineTo(OX + 10, OY);
+    ctx.lineTo(OX, OY - 10);
+    ctx.strokeStyle = '#333';
+    ctx.stroke();
+
+    /* 30° 红色弧线：左上角 */
+    ctx.beginPath();
+    ctx.arc(OX , OY - adj, 20, Math.PI/3, Math.PI/2, false);
+    ctx.strokeStyle = '#f44336';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    /* 标注 */
+    ctx.fillStyle = '#333';
+    ctx.font = '14px Arial';
+    ctx.fillText('30°', OX -30, OY - adj + 15);        // 角度
+    ctx.fillText('邻边 5√3', OX - 50, OY - adj / 2);     // AB
+    ctx.fillText('对边 5', OX + opp / 2 + 5, OY + 15);  // BC
+    ctx.fillText('斜边 10', OX + opp / 2 - 5, OY - adj / 2 + 10); // AC
+    break;
+   case 4:
+            ctx.beginPath();ctx.moveTo(0,160);ctx.lineTo(360,160);ctx.stroke();
+            ctx.fillStyle='#667eea';ctx.fillRect(220,40,30,120);
+            ctx.fillStyle='#333';ctx.fillRect(50,150,1,10);
+            ctx.fillText('1 m',55,145);ctx.fillText('50 m',120,175);ctx.fillText('0.8 m',25,170);
+            ctx.fillText('h=?',255,90);
+            break;
+        case 5:
+            ctx.beginPath();ctx.moveTo(60,160);ctx.lineTo(180,80);ctx.lineTo(220,160);ctx.closePath();ctx.stroke();
+            ctx.fillText('5 cm',190,160);ctx.fillText('7 cm',100,100);ctx.fillText('8 cm',110,170);
+            ctx.fillText('A',65,150);ctx.fillText('B',185,90);ctx.fillText('C',215,150);
+            break;
+    }
+}
+
+/* ===== 选项处理 ===== */
+document.addEventListener('click',e=>{
+    if(!e.target.classList.contains('option'))return;
+    const opt=e.target,box=opt.parentElement;
+    const levelCard=opt.closest('.level-card');
+    if(!levelCard)return;
+    const level=levelCard.id.replace('level','');
+    const ans=['6,8','10','5','62.5','82'][level-1];
+    const ok=opt.getAttribute('data-val')===ans;
+    opt.classList.remove('correct','wrong');
+    opt.classList.add(ok?'correct':'wrong');
+    if(ok){
+        $(`score${level}`).textContent='20';
+        $(`score${level}`).style.color='#4caf50';
+    }
+    box.querySelectorAll('.option').forEach(o=>{
+        o.style.pointerEvents='none';
+        o.classList.remove('correct','wrong');
+        if(o.getAttribute('data-val')===ans){
+            o.classList.add('correct');
+        }else if(o===opt && !ok){
+            o.classList.add('wrong');
+        }
+    });
+    const feedback=$(`feedback${level}`);
+    feedback.style.display='block';
+    feedback.classList.remove('correct','wrong');
+    feedback.classList.add(ok?'correct':'wrong');
+    feedback.innerHTML=ok?getCorrectFeedback(level):getWrongFeedback(level,ans);
+    if(level==='5'&&ok){
+        const total=[1,2,3,4,5].reduce((s,i)=>s+(Number($(`score${i}`).textContent)||0),0);
+        $('final-result').innerHTML=`🎉 全部完成！总得分：${total}/100`;
+    }
+});
+function getCorrectFeedback(level){
+    switch(level){
+        case '1':return '太棒了！相似三角形对应边成比例，4÷2=2，所以3×2=6，4×2=8。';
+        case '2':return '正确！根据勾股定理，6²+8²=100，√100=10 cm。';
+        case '3':return '干得好！sin 30°=1/2，对边=10×1/2=5 cm。';
+        case '4':return '完美！杆高1 m，影长0.8 m，比例为1/0.8=1.25，楼高=50×1.25=62.5 m。';
+        case '5':return '优秀！三角形中，最大边8 cm对最大角，约82°。';
+    }
+}
+function getWrongFeedback(level,ans){
+    switch(level){
+        case '1':return `不对哦！相似比例为4÷2=2，所以边长为3×2=${ans.split(',')[0]}，4×2=${ans.split(',')[1]}。`;
+        case '2':return `再想想！勾股定理：6²+8²=100，√100=${ans} cm。`;
+        case '3':return `错了！sin 30°=1/2，对边=10×1/2=${ans} cm。`;
+        case '4':return `不对！杆高1 m，影长0.8 m，比例1/0.8=1.25，楼高=50×1.25=${ans} m。`;
+        case '5':return `不对！最大边8 cm对最大角，约${ans}°。使用余弦定理计算。`;
+    }
+}
+
+/* 初始化 */
+window.onload=()=>{animateEx1();animateEx2();};
+</script>
+</body>
+</html>

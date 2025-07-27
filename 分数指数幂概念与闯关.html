@@ -1,0 +1,433 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分数指数幂与闯关游戏</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .dual {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .item {
+            text-align: center;
+            padding: 10px;
+            flex: 1;
+        }
+        .rule {
+            margin: 10px 0;
+            padding-left: 20px;
+            border-left: 3px solid #3498db;
+        }
+        .game-section {
+            text-align: center;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .progress {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <header class="section">
+        <h1>分数指数幂概念与闯关</h1>
+        <p>通过概念对偶和闯关游戏，轻松掌握分数指数幂的核心知识</p>
+    </header>
+
+    <section class="section">
+        <h2>核心概念对偶展示</h2>
+        <div class="dual">
+            <div class="item">
+                <h3>乘方与开方</h3>
+                <p><strong>乘方运算</strong><br>\( 2^3 = 8 \)<br>底数 → 指数 → 结果</p>
+            </div>
+            <div class="item">⇄</div>
+            <div class="item">
+                <p><strong>开方运算</strong><br>\( 8^{\frac{1}{3}} = 2 \)<br>结果 → 指数 → 底数</p>
+            </div>
+        </div>
+        <p>核心关系：乘方和开方是互逆运算。指数运算 \( a^n = b \) 等价于开方运算 \( b^{\frac{1}{n}} = a \)。</p>
+
+        <div class="dual">
+            <div class="item">
+                <h3>正指数与负指数</h3>
+                <p><strong>正指数幂</strong><br>\( 2^3 = 8 \)<br>表示重复乘法</p>
+            </div>
+            <div class="item">⇄</div>
+            <div class="item">
+                <p><strong>负指数幂</strong><br>\( 2^{-3} = \frac{1}{8} \)<br>表示倒数关系</p>
+            </div>
+        </div>
+        <p>核心关系：负指数表示正指数的倒数，即 \( a^{-n} = \frac{1}{a^n} \)。</p>
+
+        <div class="dual">
+            <div class="item">
+                <h3>分数指数幂</h3>
+                <p><strong>分数指数定义</strong><br>\( 8^{\frac{2}{3}} \)<br>分子是指数，分母是根指数</p>
+            </div>
+            <div class="item">-</div>
+            <div class="item">
+                <p><strong>根式表示</strong><br>\( \sqrt[3]{8^2} \)<br>先乘方后开方</p>
+            </div>
+        </div>
+        <p>核心关系：分数指数 \( a^{\frac{m}{n}} \) 等价于先计算 \( a \) 的 \( m \) 次方，再开 \( n \) 次方根。</p>
+
+        <div class="dual">
+            <div class="item">
+                <h3>负分数指数</h3>
+                <p><strong>负分数指数</strong><br>\( 8^{-\frac{2}{3}} \)<br>负指数与分数指数的组合</p>
+            </div>
+            <div class="item">-</div>
+            <div class="item">
+                <p><strong>等价形式</strong><br>\( \frac{1}{8^{\frac{2}{3}}} = \frac{1}{4} \)<br>先计算分数指数再取倒数</p>
+            </div>
+        </div>
+        <p>核心关系：负分数指数 \( a^{-\frac{m}{n}} = \frac{1}{a^{\frac{m}{n}}} \)。</p>
+
+        <h3>重要规则</h3>
+        <div class="rule">规则 1：\( a^{\frac{m}{n}} = \sqrt[n]{a^m} = (\sqrt[n]{a})^m \)</div>
+        <div class="rule">规则 2：\( a^{-n} = \frac{1}{a^n} \) （\( a \neq 0 \)）</div>
+        <div class="rule">规则 3：\( \left( \frac{a}{b} \right)^{-n} = \left( \frac{b}{a} \right)^n \)</div>
+        <div class="rule">规则 4：\( a^0 = 1 \) （\( a \neq 0 \)）</div>
+    </section>
+
+    <section class="section game-section">
+        <h2>闯关挑战</h2>
+        <p>等级: <span id="level">初级</span> | 题目: <span id="question-number">1/5</span></p>
+        <div>
+            <button onclick="switchLevel('初级')">初级关卡</button>
+            <button onclick="switchLevel('中级')">中级关卡</button>
+            <button onclick="switchLevel('高级')">高级关卡</button>
+        </div>
+        <h3 id="level-title">初级关卡</h3>
+        <p id="question">\[ \text{计算 } 8^{\frac{1}{3}} = \text{ ?} \]</p>
+        <div id="options" class="options"></div>
+        <div id="feedback" class="feedback"></div>
+        <div id="solution" style="display: none;"></div>
+        <p class="progress">当前得分: <span id="score">0</span> 分 | 正确: <span id="correct">0</span> 题 | 错误: <span id="wrong">0</span> 题</p>
+        <p>关卡进度: <span id="progress">20%</span></p>
+        <div>
+            <button onclick="showSolution()">查看提示</button>
+            <button onclick="resetGame()">重置游戏</button>
+            <button onclick="nextQuestion()">下一题</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>分数指数幂学习系统 | 设计用于帮助高一学生掌握分数指数核心概念</p>
+        <p>数学不是死记硬背，而是理解关系 - 阿尔伯特·爱因斯坦</p>
+    </footer>
+
+    <script>
+        const questions = {
+            初级: [
+                {
+                    question: "\\text{计算 } 8^{\\frac{1}{3}} = \\text{ ?}",
+                    options: [2, 3, 4, 1],
+                    answer: 2,
+                    solution: "解析：<br>\\[ 8^{\\frac{1}{3}} = \\sqrt[3]{8} = 2 \\]<br>立方根：因为 \\( 2 \\times 2 \\times 2 = 8 \\)，所以 \\( \\sqrt[3]{8} = 2 \\)"
+                },
+                {
+                    question: "\\text{计算 } 16^{\\frac{1}{2}} = \\text{ ?}",
+                    options: [4, 2, 8, 16],
+                    answer: 4,
+                    solution: "解析：<br>\\[ 16^{\\frac{1}{2}} = \\sqrt{16} = 4 \\]<br>平方根：因为 \\( 4 \\times 4 = 16 \\)，所以 \\( \\sqrt{16} = 4 \\)"
+                },
+                {
+                    question: "\\text{计算 } 27^{\\frac{1}{3}} = \\text{ ?}",
+                    options: [3, 9, 6, 2],
+                    answer: 3,
+                    solution: "解析：<br>\\[ 27^{\\frac{1}{3}} = \\sqrt[3]{27} = 3 \\]<br>立方根：因为 \\( 3 \\times 3 \\times 3 = 27 \\)，所以 \\( \\sqrt[3]{27} = 3 \\)"
+                },
+                {
+                    question: "\\text{计算 } 9^{\\frac{1}{2}} = \\text{ ?}",
+                    options: [3, 2, 4, 9],
+                    answer: 3,
+                    solution: "解析：<br>\\[ 9^{\\frac{1}{2}} = \\sqrt{9} = 3 \\]<br>平方根：因为 \\( 3 \\times 3 = 9 \\)，所以 \\( \\sqrt{9} = 3 \\)"
+                },
+                {
+                    question: "\\text{计算 } 4^{\\frac{1}{2}} = \\text{ ?}",
+                    options: [2, 4, 1, 3],
+                    answer: 2,
+                    solution: "解析：<br>\\[ 4^{\\frac{1}{2}} = \\sqrt{4} = 2 \\]<br>平方根：因为 \\( 2 \\times 2 = 4 \\)，所以 \\( \\sqrt{4} = 2 \\)"
+                }
+            ],
+            中级: [
+                {
+                    question: "\\text{计算 } 4^{-1} = \\text{ ?}",
+                    options: ["\\frac{1}{4}", "\\frac{1}{2}", 4, 2],
+                    answer: "\\frac{1}{4}",
+                    solution: "解析：<br>\\[ 4^{-1} = \\frac{1}{4^1} = \\frac{1}{4} \\]<br>负指数表示倒数：\\( a^{-n} = \\frac{1}{a^n} \\)"
+                },
+                {
+                    question: "\\text{计算 } 8^{\\frac{2}{3}} = \\text{ ?}",
+                    options: [4, 2, 8, 16],
+                    answer: 4,
+                    solution: "解析：<br>\\[ 8^{\\frac{2}{3}} = \\sqrt[3]{8^2} = \\sqrt[3]{64} = 4 \\]<br>先计算 \\( 8^2 = 64 \\)，再开立方根：\\( \\sqrt[3]{64} = 4 \\)"
+                },
+                {
+                    question: "\\text{计算 } 25^{-\\frac{1}{2}} = \\text{ ?}",
+                    options: ["\\frac{1}{5}", "\\frac{1}{25}", 5, 25],
+                    answer: "\\frac{1}{5}",
+                    solution: "解析：<br>\\[ 25^{-\\frac{1}{2}} = \\frac{1}{25^{\\frac{1}{2}}} = \\frac{1}{\\sqrt{25}} = \\frac{1}{5} \\]<br>负分数指数：先计算平方根，再取倒数"
+                },
+                {
+                    question: "\\text{计算 } \\left(\\frac{1}{9}\\right)^{-\\frac{1}{2}} = \\text{ ?}",
+                    options: [3, "\\frac{1}{3}", 9, "\\frac{1}{9}"],
+                    answer: 3,
+                    solution: "解析：<br>\\[ \\left(\\frac{1}{9}\\right)^{-\\frac{1}{2}} = 9^{\\frac{1}{2}} = \\sqrt{9} = 3 \\]<br>负指数翻转分数，再计算平方根"
+                },
+                {
+                    question: "\\text{计算 } 16^{\\frac{3}{4}} = \\text{ ?}",
+                    options: [8, 4, 16, 2],
+                    answer: 8,
+                    solution: "解析：<br>\\[ 16^{\\frac{3}{4}} = \\sqrt[4]{16^3} = \\sqrt[4]{4096} = 8 \\]<br>先计算 \\( 16^3 = 4096 \\)，再开四次方根：\\( \\sqrt[4]{4096} = 8 \\)"
+                }
+            ],
+            高级: [
+                {
+                    question: "\\text{计算 } 27^{-\\frac{2}{3}} = \\text{ ?}",
+                    options: ["\\frac{1}{9}", "\\frac{1}{3}", 9, 3],
+                    answer: "\\frac{1}{9}",
+                    solution: "解析：<br>\\[ 27^{-\\frac{2}{3}} = \\frac{1}{27^{\\frac{2}{3}}} = \\frac{1}{\\sqrt[3]{27^2}} = \\frac{1}{\\sqrt[3]{729}} = \\frac{1}{9} \\]<br>先计算 \\( 27^2 = 729 \\)，开立方根得 \\( 9 \\)，再取倒数"
+                },
+                {
+                    question: "\\text{计算 } 4^{\\frac{3}{2}} \\times 4^{-\\frac{1}{2}} = \\text{ ?}",
+                    options: [4, 2, 8, 16],
+                    answer: 4,
+                    solution: "解析：<br>\\[ 4^{\\frac{3}{2}} \\times 4^{-\\frac{1}{2}} = 4^{\\frac{3}{2} - \\frac{1}{2}} = 4^1 = 4 \\]<br>指数相加减：\\( a^m \\times a^n = a^{m+n} \\)"
+                },
+                {
+                    question: "\\text{计算 } \\left(8^{-\\frac{1}{3}}\\right)^2 = \\text{ ?}",
+                    options: ["\\frac{1}{4}", "\\frac{1}{2}", 2, 4],
+                    answer: "\\frac{1}{4}",
+                    solution: "解析：<br>\\[ \\left(8^{-\\frac{1}{3}}\\right)^2 = \\left(\\frac{1}{8^{\\frac{1}{3}}}\\right)^2 = \\frac{1}{\\left(\\sqrt[3]{8}\\right)^2} = \\frac{1}{2^2} = \\frac{1}{4} \\]<br>先计算 \\( 8^{\\frac{1}{3}} = 2 \\)，再平方并取倒数"
+                },
+                {
+                    question: "\\text{计算 } \\left(\\frac{1}{4}\\right)^{-2} = \\text{ ?}",
+                    options: [16, 4, "\\frac{1}{4}", "\\frac{1}{16}"],
+                    answer: 16,
+                    solution: "解析：<br>\\[ \\left(\\frac{1}{4}\\right)^{-2} = 4^2 = 16 \\]<br>负指数翻转分数：\\( \left(\\frac{a}{b}\\right)^{-n} = \\left(\\frac{b}{a}\\right)^n \\)"
+                },
+                {
+                    question: "\\text{计算 } 9^{\\frac{1}{2}} \\times 9^{\\frac{1}{2}} = \\text{ ?}",
+                    options: [9, 3, 18, 81],
+                    answer: 9,
+                    solution: "解析：<br>\\[ 9^{\\frac{1}{2}} \\times 9^{\\frac{1}{2}} = 9^{\\frac{1}{2} + \\frac{1}{2}} = 9^1 = 9 \\]<br>指数相加：\\( a^m \\times a^n = a^{m+n} \\)"
+                }
+            ]
+        };
+
+        let currentLevel = '初级';
+        let currentQuestion = 0;
+        let score = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        function loadQuestion() {
+            const q = questions[currentLevel][currentQuestion];
+            document.getElementById('level-title').textContent = `${currentLevel} 关卡`;
+            document.getElementById('level').textContent = currentLevel;
+            document.getElementById('question-number').textContent = `${currentQuestion + 1}/5`;
+            document.getElementById('question').innerHTML = `\\[ ${q.question} \\]`;
+
+            // Randomize options and handle mixed types with proper escaping
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            document.getElementById('options').innerHTML = shuffledOptions
+                .map(opt => {
+                    let safeOpt = String(opt).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                    return `<button onclick="checkAnswer('${safeOpt}')">\\[${opt}\\]</button>`;
+                })
+                .join('');
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('solution').style.display = 'none';
+            document.getElementById('solution').innerHTML = q.solution;
+            updateProgress();
+            MathJax.typeset();
+        }
+
+        function checkAnswer(answer) {
+            const q = questions[currentLevel][currentQuestion];
+            const feedback = document.getElementById('feedback');
+
+            // Robust normalization function
+            const normalize = (val) => {
+                if (typeof val === 'number') return val.toString();
+                let normalized = val.replace(/\\frac\{(\d+)\}\{(\d+)\}/, '$1/$2')
+                                  .replace(/\\\[|\]/g, '')
+                                  .replace(/^"|"$/, '') // Remove surrounding quotes if present
+                                  .trim();
+                return normalized;
+            };
+
+            const rawAnswer = answer; // Capture raw input
+            const normalizedAnswer = normalize(answer);
+            const normalizedCorrect = normalize(q.answer);
+
+            // Debug output to console
+            console.log('Raw Answer:', JSON.stringify(rawAnswer));
+            console.log('Normalized Answer:', JSON.stringify(normalizedAnswer));
+            console.log('Normalized Correct:', JSON.stringify(normalizedCorrect));
+
+            if (normalizedAnswer === normalizedCorrect) {
+                feedback.textContent = '恭喜！答案正确！';
+                feedback.style.color = 'green';
+                score += 10;
+                correctCount++;
+            } else {
+                feedback.textContent = '答案不正确，请再试一次！';
+                feedback.style.color = 'red';
+                incorrectCount++;
+            }
+            updateProgress();
+        }
+
+        function showSolution() {
+            document.getElementById('solution').style.display = 'block';
+            MathJax.typeset();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= questions[currentLevel].length) {
+                if (currentLevel === '初级') {
+                    if (confirm('恭喜！你已完成初级关卡！总得分：' + score + ' 分。是否进入中级关卡？')) {
+                        currentLevel = '中级';
+                    } else {
+                        resetGame();
+                        return;
+                    }
+                } else if (currentLevel === '中级') {
+                    if (confirm('恭喜！你已完成中级关卡！总得分：' + score + ' 分。是否进入高级关卡？')) {
+                        currentLevel = '高级';
+                    } else {
+                        resetGame();
+                        return;
+                    }
+                } else if (currentLevel === '高级') {
+                    alert('恭喜你通关所有关卡！总得分：' + score + ' 分。你的努力令人钦佩，继续保持这种学习热情吧！是否重置游戏？');
+                    if (confirm('是否重置游戏？')) {
+                        resetGame();
+                    }
+                    return;
+                }
+                currentQuestion = 0;
+            }
+            loadQuestion();
+        }
+
+        function switchLevel(level) {
+            currentLevel = level;
+            currentQuestion = 0;
+            loadQuestion();
+        }
+
+        function resetGame() {
+            currentLevel = '初级';
+            currentQuestion = 0;
+            score = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            loadQuestion();
+        }
+
+        function updateProgress() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correctCount;
+            document.getElementById('wrong').textContent = incorrectCount;
+            document.getElementById('progress').textContent = `${((currentQuestion + 1) / questions[currentLevel].length * 100).toFixed(0)}%`;
+        }
+
+        // Initialize game
+        loadQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>指数函数冒险岛 - 完整版</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            min-height: 100vh;
+        }
+        .game-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .game-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f1c40f);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(45deg, #2980b9, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 10px 0;
+            border-bottom: 3px solid #3498db;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            background-color: #e9ecef;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab:hover {
+            background-color: #dee2e6;
+            transform: translateY(-3px);
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #3498db;
+            color: #2980b9;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+            animation: fadeIn 0.5s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .island {
+            margin-bottom: 35px;
+            border: 2px solid #3498db;
+            border-radius: 12px;
+            padding: 25px;
+            background: linear-gradient(to bottom right, #eaf7ff, #ffffff);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .island::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        .island h2 {
+            color: #2980b9;
+            margin-top: 0;
+            padding-bottom: 12px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px dashed #bdc3c7;
+        }
+        .graph-container {
+            width: 100%;
+            height: 320px;
+            background-color: white;
+            border: 1px solid #ddd;
+            margin: 25px 0;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .control-group {
+            margin: 10px;
+            min-width: 180px;
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+            font-size: 1.05rem;
+        }
+        input, select {
+            padding: 12px 15px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
+        }
+        button {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            margin: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .explanation {
+            background: linear-gradient(to right, #f9f9f9, #ffffff);
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 25px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+        .explanation h3 {
+            margin-top: 0;
+            color: #2980b9;
+            font-size: 1.4rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .task {
+            background: linear-gradient(to right, #e8f8f5, #ffffff);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #2ecc71;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+        .task h3 {
+            margin-top: 0;
+            color: #27ae60;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        .correct {
+            background-color: #d5f5e3;
+            border-left: 4px solid #2ecc71;
+        }
+        .incorrect {
+            background-color: #fadbd8;
+            border-left: 4px solid #e74c3c;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin: 30px 0;
+            height: 30px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.8s ease;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            line-height: 30px;
+            font-size: 16px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .knowledge-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .knowledge-card {
+            flex: 1 1 320px;
+            margin: 10px;
+            padding: 25px;
+            background: linear-gradient(to bottom right, #f9f9f9, #ffffff);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .knowledge-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3498db, #2ecc71);
+        }
+        .knowledge-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .knowledge-card h3 {
+            color: #2980b9;
+            margin-top: 0;
+            padding-bottom: 12px;
+            font-size: 1.5rem;
+        }
+        .formula {
+            background: linear-gradient(to right, #f0f0f0, #e0e0e0);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 18px 0;
+            overflow-x: auto;
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: center;
+            border: 1px dashed #bdc3c7;
+        }
+        .properties {
+            margin: 18px 0;
+        }
+        .property {
+            margin: 15px 0;
+            padding-left: 20px;
+            border-left: 3px solid #3498db;
+            position: relative;
+            font-size: 16px;
+        }
+        .property:before {
+            content: "•";
+            color: #3498db;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 24px;
+        }
+        .example {
+            background: linear-gradient(to right, #e8f4f8, #d6eaf8);
+            padding: 18px;
+            border-radius: 8px;
+            margin: 18px 0;
+            border-left: 4px solid #3498db;
+        }
+        .quiz-question {
+            margin: 25px 0;
+            padding: 25px;
+            background: linear-gradient(to right, #f5f5f5, #ffffff);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+        .quiz-options {
+            margin: 20px 0;
+        }
+        .quiz-option {
+            margin: 12px 0;
+            padding: 15px;
+            background: linear-gradient(to right, #e9e9e9, #f5f5f5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+        .quiz-option:hover {
+            background: linear-gradient(to right, #ddd, #e9e9e9);
+            transform: translateX(8px);
+        }
+        .quiz-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 16px;
+        }
+        .game-message {
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+            animation: fadeIn 0.5s;
+            font-size: 18px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .success {
+            background: linear-gradient(to right, #d5f5e3, #c1f0d0);
+            border-left: 5px solid #2ecc71;
+        }
+        .warning {
+            background: linear-gradient(to right, #fff3cd, #ffeeba);
+            border-left: 5px solid #ffc107;
+        }
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(to right, #f8f9fa, #ffffff);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .stat {
+            text-align: center;
+            margin: 10px;
+            min-width: 120px;
+            padding: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            flex: 1;
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .stat-label {
+            font-size: 16px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .about-content {
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+        }
+        .about-content h3 {
+            color: #2980b9;
+            margin-top: 0;
+            font-size: 1.6rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .about-content ul, .about-content ol {
+            padding-left: 25px;
+        }
+        .about-content li {
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .answer-input {
+            padding: 12px 15px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 180px;
+            transition: all 0.3s;
+        }
+        .answer-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #3498db, #2980b9);
+        }
+        .btn-secondary {
+            background: linear-gradient(to right, #95a5a6, #7f8c8d);
+        }
+        .btn-success {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            .control-group {
+                margin: 10px 0;
+                width: 100%;
+            }
+            .knowledge-card {
+                flex: 1 1 100%;
+            }
+            .game-stats {
+                flex-direction: column;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .island {
+                padding: 20px 15px;
+            }
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .answer-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>📈 指数函数冒险岛 🏝️</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('game')">🎮 游戏</div>
+            <div class="tab" onclick="switchTab('knowledge')">📚 知识库</div>
+            <div class="tab" onclick="switchTab('about')">ℹ️ 关于</div>
+        </div>
+        
+        <!-- 游戏标签页 -->
+        <div id="game-tab" class="tab-content active">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress">0%</div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">得分</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">连续正确</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="level">1</div>
+                    <div class="stat-label">等级</div>
+                </div>
+            </div>
+            
+            <div class="game-message" id="level-up-message"></div>
+            
+            <div class="island" id="growth-island">
+                <h2>🏝️ 繁荣岛 - 指数增长</h2>
+                <p>欢迎来到繁荣岛！这里的一切都在快速增长。让我们学习指数增长函数 y = a·bˣ (b > 1)。</p>
+                
+                <div class="task">
+                    <h3>💰 任务1: 银行存款</h3>
+                    <p>假设你在银行存入 <span id="growth-a-value">100</span> 元，年利率为 <span id="growth-rate-value">10</span>%，每年复利一次。计算 <span id="growth-years-value">5</span> 年后的存款总额。</p>
+                    <p>公式: y = <span id="growth-formula-a">100</span> × (1 + <span id="growth-formula-rate">0.10</span>)<sup>x</sup></p>
+                    <div class="input-group">
+                        <input type="number" id="growth-answer" placeholder="输入答案" class="answer-input">
+                        <button onclick="checkGrowthAnswer()" class="btn-primary">提交答案</button>
+                        <button onclick="generateGrowthQuestion()" class="btn-secondary">换一题</button>
+                    </div>
+                    <div class="feedback" id="growth-feedback"></div>
+                </div>
+                
+                <div class="graph-container">
+                    <canvas id="growth-canvas"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="growth-a">初始值 (a):</label>
+                        <input type="number" id="growth-a" value="100" min="1" step="10" onchange="updateGrowthGraph()">
+                    </div>
+                    <div class="control-group">
+                        <label for="growth-rate">增长率 (%):</label>
+                        <input type="number" id="growth-rate" value="10" min="1" max="100" step="5" onchange="updateGrowthGraph()">
+                    </div>
+                    <div class="control-group">
+                        <label for="growth-years">年数:</label>
+                        <input type="number" id="growth-years" value="5" min="1" max="20" step="1" onchange="generateGrowthQuestion()">
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h3>📈 指数增长特征</h3>
+                    <p>随着x的增加，y值增长越来越快，曲线呈现"J"形。</p>
+                    <p>应用实例：</p>
+                    <ul>
+                        <li>复利计算的银行存款</li>
+                        <li>细菌繁殖（每20分钟分裂一次）</li>
+                        <li>社交媒体信息的传播</li>
+                        <li>人口增长（在资源充足条件下）</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="island" id="decay-island">
+                <h2>🏝️ 衰减岛 - 指数衰减</h2>
+                <p>欢迎来到衰减岛！这里的事物会逐渐减少。让我们学习指数衰减函数 y = a·bˣ (0 < b < 1)。</p>
+                
+                <div class="task">
+                    <h3>💊 任务2: 药物代谢</h3>
+                    <p>假设你服用了一片药物，体内初始含量为 <span id="decay-a-value">200</span> mg，每小时代谢掉 <span id="decay-rate-value">15</span>%。计算 <span id="decay-hours-value">6</span> 小时后体内的药物含量。</p>
+                    <p>公式: y = <span id="decay-formula-a">200</span> × (1 - <span id="decay-formula-rate">0.15</span>)<sup>x</sup></p>
+                    <div class="input-group">
+                        <input type="number" id="decay-answer" placeholder="输入答案" class="answer-input">
+                        <button onclick="checkDecayAnswer()" class="btn-primary">提交答案</button>
+                        <button onclick="generateDecayQuestion()" class="btn-secondary">换一题</button>
+                    </div>
+                    <div class="feedback" id="decay-feedback"></div>
+                </div>
+                
+                <div class="graph-container">
+                    <canvas id="decay-canvas"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="decay-a">初始值 (a):</label>
+                        <input type="number" id="decay-a" value="200" min="1" step="10" onchange="updateDecayGraph()">
+                    </div>
+                    <div class="control-group">
+                        <label for="decay-rate">衰减率 (%):</label>
+                        <input type="number" id="decay-rate" value="15" min="1" max="99" step="5" onchange="updateDecayGraph()">
+                    </div>
+                    <div class="control-group">
+                        <label for="decay-hours">小时数:</label>
+                        <input type="number" id="decay-hours" value="6" min="1" max="24" step="1" onchange="generateDecayQuestion()">
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h3>📉 指数衰减特征</h3>
+                    <p>随着x的增加，y值减少越来越慢，曲线逐渐接近x轴但永不触及。</p>
+                    <p>应用实例：</p>
+                    <ul>
+                        <li>放射性物质的衰变</li>
+                        <li>药物在体内的代谢</li>
+                        <li>汽车价值的折旧</li>
+                        <li>电容器的放电过程</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="task" id="final-task" style="display:none;">
+                <h3>🏆 最终挑战</h3>
+                <p>恭喜你完成了两个岛屿的任务！现在回答以下问题来检验你的理解：</p>
+                <div class="quiz-question">
+                    <p>1. 指数增长和指数衰减函数在图像上有什么区别？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkFinalAnswer(1, this)">增长函数上升越来越快，衰减函数下降越来越慢</div>
+                        <div class="quiz-option" onclick="checkFinalAnswer(1, this)">增长函数是直线，衰减函数是曲线</div>
+                        <div class="quiz-option" onclick="checkFinalAnswer(1, this)">两者没有区别</div>
+                    </div>
+                    <div class="quiz-feedback" id="final-feedback-1"></div>
+                </div>
+                
+                <div class="quiz-question">
+                    <p>2. 下列哪个场景最适合用指数函数描述？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkFinalAnswer(2, this)">银行复利存款</div>
+                        <div class="quiz-option" onclick="checkFinalAnswer(2, this)">匀速行驶的汽车</div>
+                        <div class="quiz-option" onclick="checkFinalAnswer(2, this)">自由落体的物体</div>
+                    </div>
+                    <div class="quiz-feedback" id="final-feedback-2"></div>
+                </div>
+                
+                <div class="quiz-question">
+                    <p>3. 当x趋近于无穷大时，指数衰减函数y值会怎样？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkFinalAnswer(3, this)">趋近于0但不等于0</div>
+                        <div class="quiz-option" onclick="checkFinalAnswer(3, this)">趋近于无穷大</div>
+                        <div class="quiz-option" onclick="checkFinalAnswer(3, this)">保持不变</div>
+                    </div>
+                    <div class="quiz-feedback" id="final-feedback-3"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 知识库标签页 -->
+        <div id="knowledge-tab" class="tab-content">
+            <h2>📚 指数函数知识库</h2>
+            
+            <div class="knowledge-content">
+                <div class="knowledge-card">
+                    <h3>🔍 什么是指数函数？</h3>
+                    <div class="formula">y = a·bˣ</div>
+                    <p>指数函数是以常数b为底数，x为指数的函数，其中a是初始值，b是底数。</p>
+                    <p>当b > 1时，函数呈现指数增长；当0 < b < 1时，函数呈现指数衰减。</p>
+                    <div class="example">
+                        <strong>例子：</strong>
+                        <p>增长函数：y = 2·3ˣ</p>
+                        <p>衰减函数：y = 100·0.5ˣ</p>
+                    </div>
+                </div>
+                
+                <div class="knowledge-card">
+                    <h3>📈 指数增长函数</h3>
+                    <div class="formula">y = a·bˣ (b > 1)</div>
+                    <div class="properties">
+                        <div class="property">图像特征：从左向右快速上升的曲线</div>
+                        <div class="property">定义域：所有实数 (-∞, +∞)</div>
+                        <div class="property">值域：(0, +∞)</div>
+                        <div class="property">y截距：(0, a)</div>
+                        <div class="property">渐近线：y = 0</div>
+                    </div>
+                    <div class="example">
+                        <strong>例子：</strong>细菌繁殖，初始数量为100，每小时增长50%：
+                        <div class="formula">y = 100 × 1.5ˣ</div>
+                    </div>
+                </div>
+                
+                <div class="knowledge-card">
+                    <h3>📉 指数衰减函数</h3>
+                    <div class="formula">y = a·bˣ (0 < b < 1)</div>
+                    <div class="properties">
+                        <div class="property">图像特征：从左向右逐渐趋近x轴的曲线</div>
+                        <div class="property">定义域：所有实数 (-∞, +∞)</div>
+                        <div class="property">值域：(0, +∞)</div>
+                        <div class="property">y截距：(0, a)</div>
+                        <div class="property">渐近线：y = 0</div>
+                    </div>
+                    <div class="example">
+                        <strong>例子：</strong>放射性物质衰变，初始质量为200g，半衰期为10小时：
+                        <div class="formula">y = 200 × 0.5ˣ/¹⁰</div>
+                    </div>
+                </div>
+                
+                <div class="knowledge-card">
+                    <h3>🧮 指数函数的性质</h3>
+                    <div class="properties">
+                        <div class="property">函数值始终为正 (y > 0)</div>
+                        <div class="property">当x增加1单位时，y变为原来的b倍</div>
+                        <div class="property">增长/衰减速度与当前值成正比</div>
+                        <div class="property">导数与原函数成正比 (dy/dx = k·y)</div>
+                        <div class="property">没有最大值或最小值</div>
+                    </div>
+                </div>
+                
+                <div class="knowledge-card">
+                    <h3>⚛️ 自然指数函数</h3>
+                    <div class="formula">y = a·eᵏˣ</div>
+                    <p>以自然常数e≈2.71828为底的指数函数，在科学和工程中广泛应用。</p>
+                    <div class="properties">
+                        <div class="property">k > 0：指数增长</div>
+                        <div class="property">k < 0：指数衰减</div>
+                        <div class="property">导数等于自身：dy/dx = k·y</div>
+                    </div>
+                    <div class="example">
+                        <strong>应用：</strong>
+                        <p>连续复利计算</p>
+                        <p>放射性衰变</p>
+                        <p>RC电路分析</p>
+                    </div>
+                </div>
+                
+                <div class="knowledge-card">
+                    <h3>🌍 实际应用案例</h3>
+                    <div class="example">
+                        <strong>增长案例：</strong>
+                        <ul>
+                            <li>人口增长模型</li>
+                            <li>病毒传播</li>
+                            <li>投资收益计算</li>
+                            <li>社交媒体传播</li>
+                        </ul>
+                    </div>
+                    <div class="example">
+                        <strong>衰减案例：</strong>
+                        <ul>
+                            <li>药物代谢</li>
+                            <li>电容放电</li>
+                            <li>声音衰减</li>
+                            <li>温度冷却</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task">
+                <h3>🧠 知识小测验</h3>
+                <div class="quiz-question">
+                    <p>1. 指数函数y=2·3ˣ的增长因子是多少？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(1, this)">2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(1, this)">3</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(1, this)">6</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-1"></div>
+                </div>
+                
+                <div class="quiz-question">
+                    <p>2. 下列哪个函数的衰减最快？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(2, this)">y=100·0.9ˣ</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(2, this)">y=100·0.5ˣ</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(2, this)">y=100·0.1ˣ</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-2"></div>
+                </div>
+                
+                <div class="quiz-question">
+                    <p>3. 指数函数y=a·bˣ的y截距是？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(3, this)">(0,0)</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(3, this)">(0,a)</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(3, this)">(0,b)</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-3"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>4. 方程 2<sup>x</sup> = 8 的解是？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(4, this)">x=2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(4, this)">x=3</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(4, this)">x=4</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-4"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>5. 不等式 3<sup>x</sup> < 9 的解集是？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(5, this)">x < 2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(5, this)">x > 2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(5, this)">x < 3</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-5"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>6. 比较大小：0.5<sup>2</sup> 和 0.5<sup>3</sup></p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(6, this)">0.5² > 0.5³</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(6, this)">0.5² < 0.5³</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(6, this)">0.5² = 0.5³</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-6"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>7. 方程 4<sup>x</sup> = 2<sup>x+1</sup> 的解是？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(7, this)">x=1</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(7, this)">x=2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(7, this)">x=0</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-7"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>8. 下列哪组数值中，y=2<sup>x</sup> 的函数值最大？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(8, this)">x=0</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(8, this)">x=1</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(8, this)">x=3</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-8"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>9. 不等式 (1/3)<sup>x</sup> > 1/9 的解集是？</p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(9, this)">x < 2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(9, this)">x > 2</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(9, this)">x < -2</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-9"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <p>10. 比较大小：2<sup>3</sup> 和 3<sup>2</sup></p>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(10, this)">2³ > 3²</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(10, this)">2³ < 3²</div>
+                        <div class="quiz-option" onclick="checkKnowledgeAnswer(10, this)">2³ = 3²</div>
+                    </div>
+                    <div class="quiz-feedback" id="knowledge-feedback-10"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 关于标签页 -->
+        <div id="about-tab" class="tab-content">
+            <div class="about-content">
+                <h2>ℹ️ 关于指数函数冒险岛</h2>
+                <p>这个互动学习工具旨在帮助高中学生通过游戏化方式理解指数函数的概念和应用。</p>
+                
+                <h3>🎯 学习目标</h3>
+                <ul>
+                    <li>理解指数增长和指数衰减的定义</li>
+                    <li>掌握指数函数的图像特征</li>
+                    <li>能够应用指数函数解决实际问题</li>
+                    <li>区分指数函数与其他类型函数的区别</li>
+                    <li>培养数学建模和问题解决能力</li>
+                </ul>
+                
+                <h3>🕹️ 使用方法</h3>
+                <ol>
+                    <li>在"游戏"标签页完成两个岛屿的任务</li>
+                    <li>通过调整参数观察函数图像变化</li>
+                    <li>在"知识库"标签页学习理论知识</li>
+                    <li>完成测验检验学习成果</li>
+                    <li>查看进度和得分，挑战更高等级</li>
+                </ol>
+                
+                <h3>👨‍🎓 适用对象</h3>
+                <p>高中一年级及以上学生</p>
+                <p>需要复习指数函数的大学低年级学生</p>
+                <p>对数学感兴趣的自学者</p>
+                
+                <h3>📊 数学知识点</h3>
+                <ul>
+                    <li>指数函数的基本概念</li>
+                    <li>函数图像与性质</li>
+                    <li>实际应用问题</li>
+                    <li>自然指数函数</li>
+                    <li>半衰期与倍增时间</li>
+                </ul>
+                
+                <h3>🛠️ 技术特点</h3>
+                <ul>
+                    <li>响应式设计，适配各种设备</li>
+                    <li>交互式图表，实时反馈</li>
+                    <li>游戏化学习体验</li>
+                    <li>即时评估与反馈</li>
+                    <li>丰富的实际应用案例</li>
+                </ul>
+                
+                <div class="footer">
+                    <p>© 2023 指数函数冒险岛 - 数学教育工具</p>
+                    <p>版本 2.0 | 最后更新: 2023年11月</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        let gameState = {
+            score: 0,
+            streak: 0,
+            level: 1,
+            completedTasks: 0
+        };
+        
+        // 切换标签页
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // 更新游戏状态显示
+        function updateGameStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('streak').textContent = gameState.streak;
+            document.getElementById('level').textContent = gameState.level;
+            
+            // 更新进度
+            const progress = Math.min(100, gameState.completedTasks * 50);
+            const progressBar = document.getElementById('progress');
+            progressBar.style.width = `${progress}%`;
+            progressBar.textContent = `${progress}%`;
+            
+            // 检查是否解锁最终任务
+            if (gameState.completedTasks >= 2) {
+                document.getElementById('final-task').style.display = 'block';
+            }
+        }
+        
+        // 显示升级消息
+        function showLevelUp() {
+            const message = document.getElementById('level-up-message');
+            message.textContent = `🎉 恭喜升级！现在是等级 ${gameState.level}`;
+            message.className = 'game-message success';
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 绘制增长图表
+        function updateGrowthGraph() {
+            const a = parseFloat(document.getElementById('growth-a').value);
+            const rate = parseFloat(document.getElementById('growth-rate').value);
+            const years = parseFloat(document.getElementById('growth-years').value);
+            const b = 1 + rate / 100;
+            
+            // 更新显示值
+            document.getElementById('growth-a-value').textContent = a;
+            document.getElementById('growth-rate-value').textContent = rate;
+            document.getElementById('growth-years-value').textContent = years;
+            document.getElementById('growth-formula-a').textContent = a;
+            document.getElementById('growth-formula-rate').textContent = (rate / 100).toFixed(2);
+            
+            const canvas = document.getElementById('growth-canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            // 清除画布
+            ctx.clearRect(0, 0, width, height);
+            
+            // 绘制坐标轴
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            // Y轴
+            ctx.beginPath();
+            ctx.moveTo(50, 20);
+            ctx.lineTo(50, height - 30);
+            ctx.stroke();
+            
+            // X轴
+            ctx.beginPath();
+            ctx.moveTo(50, height - 30);
+            ctx.lineTo(width - 10, height - 30);
+            ctx.stroke();
+            
+            // 绘制箭头
+            ctx.beginPath();
+            ctx.moveTo(50, 20);
+            ctx.lineTo(45, 30);
+            ctx.lineTo(55, 30);
+            ctx.closePath();
+            ctx.fillStyle = '#333';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(width - 10, height - 30);
+            ctx.lineTo(width - 20, height - 35);
+            ctx.lineTo(width - 20, height - 25);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 动态调整X轴范围
+            const maxX = Math.max(10, years); // 至少显示10个单位，但不超过years
+            const xStep = (width - 60) / maxX;
+            
+            // 绘制刻度
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            for (let i = 0; i <= maxX; i++) {
+                const x = 50 + i * xStep;
+                ctx.beginPath();
+                ctx.moveTo(x, height - 30);
+                ctx.lineTo(x, height - 25);
+                ctx.stroke();
+                ctx.fillText(i, x, height - 10);
+            }
+            
+            // Y轴刻度
+            const maxY = a * Math.pow(b, maxX);
+            for (let i = 0; i <= 5; i++) {
+                const y = height - 30 - i * (height - 50) / 5;
+                ctx.beginPath();
+                ctx.moveTo(50, y);
+                ctx.lineTo(55, y);
+                ctx.stroke();
+                ctx.fillText(Math.round(maxY * i / 5), 35, y + 5);
+            }
+            
+            // 高亮显示问题中的年数位置
+            if (years <= maxX) {
+                const highlightX = 50 + years * xStep;
+                const yValue = a * Math.pow(b, years);
+                const highlightY = height - 30 - (yValue / maxY) * (height - 50);
+                
+                // 绘制垂直线
+                ctx.strokeStyle = '#2ecc71';
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.moveTo(highlightX, 20);
+                ctx.lineTo(highlightX, height - 30);
+                ctx.stroke();
+                
+                // 绘制水平线
+                ctx.beginPath();
+                ctx.moveTo(50, highlightY);
+                ctx.lineTo(highlightX, highlightY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // 绘制交点
+                ctx.fillStyle = '#2ecc71';
+                ctx.beginPath();
+                ctx.arc(highlightX, highlightY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 添加标签
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText(`第${years}年`, highlightX, height - 40);
+                ctx.fillText(yValue.toFixed(1), 35, highlightY + 5);
+            }
+            
+            // 绘制曲线
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let x = 0; x <= maxX; x += 0.1) {
+                const y = a * Math.pow(b, x);
+                const px = 50 + x * xStep;
+                const py = height - 30 - (y / maxY) * (height - 50);
+                
+                if (x === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            
+            // 绘制整数点
+            ctx.fillStyle = '#e74c3c';
+            for (let x = 0; x <= maxX; x++) {
+                const y = a * Math.pow(b, x);
+                const px = 50 + x * xStep;
+                const py = height - 30 - (y / maxY) * (height - 50);
+                
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // 添加函数公式标签
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#2980b9';
+            ctx.textAlign = 'left';
+            ctx.fillText(`y = ${a.toFixed(0)} × ${b.toFixed(2)}ˣ`, 60, 30);
+        }
+        
+        // 绘制衰减图表
+        function updateDecayGraph() {
+            const a = parseFloat(document.getElementById('decay-a').value);
+            const rate = parseFloat(document.getElementById('decay-rate').value);
+            const hours = parseFloat(document.getElementById('decay-hours').value);
+            const b = 1 - rate / 100;
+            
+            // 更新显示值
+            document.getElementById('decay-a-value').textContent = a;
+            document.getElementById('decay-rate-value').textContent = rate;
+            document.getElementById('decay-hours-value').textContent = hours;
+            document.getElementById('decay-formula-a').textContent = a;
+            document.getElementById('decay-formula-rate').textContent = (rate / 100).toFixed(2);
+            
+            const canvas = document.getElementById('decay-canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            // 清除画布
+            ctx.clearRect(0, 0, width, height);
+            
+            // 绘制坐标轴
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            // Y轴
+            ctx.beginPath();
+            ctx.moveTo(50, 20);
+            ctx.lineTo(50, height - 30);
+            ctx.stroke();
+            
+            // X轴
+            ctx.beginPath();
+            ctx.moveTo(50, height - 30);
+            ctx.lineTo(width - 10, height - 30);
+            ctx.stroke();
+            
+            // 绘制箭头
+            ctx.beginPath();
+            ctx.moveTo(50, 20);
+            ctx.lineTo(45, 30);
+            ctx.lineTo(55, 30);
+            ctx.closePath();
+            ctx.fillStyle = '#333';
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(width - 10, height - 30);
+            ctx.lineTo(width - 20, height - 35);
+            ctx.lineTo(width - 20, height - 25);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 动态调整X轴范围
+            const maxX = Math.max(10, hours); // 至少显示10小时，但不超过hours
+            const xStep = (width - 60) / maxX;
+            
+            // 绘制刻度
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            for (let i = 0; i <= maxX; i++) {
+                const x = 50 + i * xStep;
+                ctx.beginPath();
+                ctx.moveTo(x, height - 30);
+                ctx.lineTo(x, height - 25);
+                ctx.stroke();
+                ctx.fillText(i, x, height - 10);
+            }
+            
+            // Y轴刻度
+            for (let i = 0; i <= 5; i++) {
+                const y = height - 30 - i * (height - 50) / 5;
+                ctx.beginPath();
+                ctx.moveTo(50, y);
+                ctx.lineTo(55, y);
+                ctx.stroke();
+                ctx.fillText(Math.round(a * i / 5), 35, y + 5);
+            }
+            
+            // 高亮显示问题中的小时数位置
+            if (hours <= maxX) {
+                const highlightX = 50 + hours * xStep;
+                const yValue = a * Math.pow(b, hours);
+                const highlightY = height - 30 - (yValue / a) * (height - 50);
+                
+                // 绘制垂直线
+                ctx.strokeStyle = '#2ecc71';
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.moveTo(highlightX, 20);
+                ctx.lineTo(highlightX, height - 30);
+                ctx.stroke();
+                
+                // 绘制水平线
+                ctx.beginPath();
+                ctx.moveTo(50, highlightY);
+                ctx.lineTo(highlightX, highlightY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // 绘制交点
+                ctx.fillStyle = '#2ecc71';
+                ctx.beginPath();
+                ctx.arc(highlightX, highlightY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 添加标签
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillText(`${hours}小时`, highlightX, height - 40);
+                ctx.fillText(yValue.toFixed(1), 35, highlightY + 5);
+            }
+            
+            // 绘制曲线
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let x = 0; x <= maxX; x += 0.1) {
+                const y = a * Math.pow(b, x);
+                const px = 50 + x * xStep;
+                const py = height - 30 - (y / a) * (height - 50);
+                
+                if (x === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            
+            // 绘制整数点
+            ctx.fillStyle = '#3498db';
+            for (let x = 0; x <= maxX; x++) {
+                const y = a * Math.pow(b, x);
+                const px = 50 + x * xStep;
+                const py = height - 30 - (y / a) * (height - 50);
+                
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // 添加函数公式标签
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#2980b9';
+            ctx.textAlign = 'left';
+            ctx.fillText(`y = ${a.toFixed(0)} × ${b.toFixed(2)}ˣ`, 60, 30);
+        }
+        
+        // 生成增长问题
+        function generateGrowthQuestion() {
+            const a = parseInt(document.getElementById('growth-a').value);
+            const rate = parseInt(document.getElementById('growth-rate').value);
+            const years = parseInt(document.getElementById('growth-years').value);
+            
+            // 更新显示值
+            document.getElementById('growth-years-value').textContent = years;
+            document.getElementById('growth-formula-rate').textContent = (rate / 100).toFixed(2);
+            
+            // 清空答案和反馈
+            document.getElementById('growth-answer').value = '';
+            document.getElementById('growth-feedback').style.display = 'none';
+            
+            // 更新图表
+            updateGrowthGraph();
+        }
+        
+        // 生成衰减问题
+        function generateDecayQuestion() {
+            const a = parseInt(document.getElementById('decay-a').value);
+            const rate = parseInt(document.getElementById('decay-rate').value);
+            const hours = parseInt(document.getElementById('decay-hours').value);
+            
+            // 更新显示值
+            document.getElementById('decay-hours-value').textContent = hours;
+            document.getElementById('decay-formula-rate').textContent = (rate / 100).toFixed(2);
+            
+            // 清空答案和反馈
+            document.getElementById('decay-answer').value = '';
+            document.getElementById('decay-feedback').style.display = 'none';
+            
+            // 更新图表
+            updateDecayGraph();
+        }
+        
+        // 检查增长问题的答案
+        function checkGrowthAnswer() {
+            const a = parseFloat(document.getElementById('growth-a').value);
+            const rate = parseFloat(document.getElementById('growth-rate').value);
+            const years = parseFloat(document.getElementById('growth-years').value);
+            const b = 1 + rate / 100;
+            
+            const correctAnswer = (a * Math.pow(b, years)).toFixed(2);
+            const userAnswer = parseFloat(document.getElementById('growth-answer').value);
+            
+            const feedback = document.getElementById('growth-feedback');
+            
+            if (userAnswer && Math.abs(userAnswer - correctAnswer) < 0.1) {
+                feedback.textContent = `✅ 正确！${years}年后你的存款将是约${correctAnswer}元。`;
+                feedback.className = 'feedback correct';
+                
+                // 更新游戏状态
+                gameState.score += 10;
+                gameState.streak += 1;
+                if (gameState.streak % 3 === 0) {
+                    gameState.level += 1;
+                    showLevelUp();
+                }
+                gameState.completedTasks = Math.max(gameState.completedTasks, 1);
+                updateGameStats();
+            } else {
+                feedback.textContent = `❌ 不太对。正确的计算是${a} × ${b.toFixed(2)}⁵ ≈ ${correctAnswer}。再试试看！`;
+                feedback.className = 'feedback incorrect';
+                gameState.streak = 0;
+                updateGameStats();
+            }
+            feedback.style.display = 'block';
+        }
+        
+        // 检查衰减问题的答案
+        function checkDecayAnswer() {
+            const a = parseFloat(document.getElementById('decay-a').value);
+            const rate = parseFloat(document.getElementById('decay-rate').value);
+            const hours = parseFloat(document.getElementById('decay-hours').value);
+            const b = 1 - rate / 100;
+            
+            const correctAnswer = (a * Math.pow(b, hours)).toFixed(2);
+            const userAnswer = parseFloat(document.getElementById('decay-answer').value);
+            
+            const feedback = document.getElementById('decay-feedback');
+            
+            if (userAnswer && Math.abs(userAnswer - correctAnswer) < 0.1) {
+                feedback.textContent = `✅ 正确！${hours}小时后体内药物含量约为${correctAnswer}mg。`;
+                feedback.className = 'feedback correct';
+                
+                // 更新游戏状态
+                gameState.score += 10;
+                gameState.streak += 1;
+                if (gameState.streak % 3 === 0) {
+                    gameState.level += 1;
+                    showLevelUp();
+                }
+                gameState.completedTasks = Math.max(gameState.completedTasks, 2);
+                updateGameStats();
+            } else {
+                feedback.textContent = `❌ 不太对。正确的计算是${a} × ${b.toFixed(2)}⁶ ≈ ${correctAnswer}。再试试看！`;
+                feedback.className = 'feedback incorrect';
+                gameState.streak = 0;
+                updateGameStats();
+            }
+            feedback.style.display = 'block';
+        }
+        
+        // 检查最终答案
+        function checkFinalAnswer(questionNum, option) {
+            const correctAnswers = {
+                1: 0, // 第一个选项正确
+                2: 0, // 第一个选项正确
+                3: 0  // 第一个选项正确
+            };
+            
+            const feedback = document.getElementById(`final-feedback-${questionNum}`);
+            const options = option.parentElement.children;
+            
+            // 移除所有选项的高亮
+            for (let i = 0; i < options.length; i++) {
+                options[i].style.backgroundColor = '';
+                options[i].style.backgroundImage = '';
+            }
+            
+            // 检查答案
+            if (Array.from(options).indexOf(option) === correctAnswers[questionNum]) {
+                option.style.background = 'linear-gradient(to right, #d5f5e3, #c1f0d0)';
+                feedback.textContent = getFinalFeedback(questionNum, true);
+                feedback.className = 'quiz-feedback correct';
+                
+                // 更新游戏状态
+                gameState.score += 5;
+                updateGameStats();
+            } else {
+                option.style.background = 'linear-gradient(to right, #fadbd8, #f5cac9)';
+                feedback.textContent = getFinalFeedback(questionNum, false);
+                feedback.className = 'quiz-feedback incorrect';
+            }
+            feedback.style.display = 'block';
+        }
+        
+        // 获取最终问题的反馈
+        function getFinalFeedback(questionNum, isCorrect) {
+            const feedback = {
+                1: {
+                    correct: "✅ 正确！指数增长函数随着x增加而快速上升，指数衰减函数随着x增加而逐渐趋近于0。",
+                    incorrect: "❌ 注意：指数增长函数不是直线，而是上升越来越快的曲线；指数衰减函数是下降越来越慢的曲线。"
+                },
+                2: {
+                    correct: "✅ 正确！银行复利存款是指数增长的典型例子。",
+                    incorrect: "❌ 匀速行驶的汽车是线性函数，自由落体是二次函数，只有复利存款是指数函数。"
+                },
+                3: {
+                    correct: "✅ 正确！指数衰减函数趋近于0但永远不会等于0。",
+                    incorrect: "❌ 再想想：指数衰减函数会无限接近0但不会真正达到0。"
+                }
+            };
+            
+            return isCorrect ? feedback[questionNum].correct : feedback[questionNum].incorrect;
+        }
+        
+        // 检查知识库测验答案
+        function checkKnowledgeAnswer(questionNum, option) {
+            const correctAnswers = {
+                1: 1, // 第二个选项正确
+                2: 2, // 第三个选项正确
+                3: 1, // 第二个选项正确
+                4: 1, // 第二选项正确 (x=3)
+                5: 0, // 第一选项正确 (x<2)
+                6: 0, // 第一选项正确 (0.5² > 0.5³)
+                7: 0, // 第一选项正确 (x=1)
+                8: 2, // 第三选项正确 (x=3)
+                9: 0, // 第一选项正确 (x<2)
+                10: 1 // 第二选项正确 (2³ < 3²)
+            };
+            
+            const feedback = document.getElementById(`knowledge-feedback-${questionNum}`);
+            const options = option.parentElement.children;
+            
+            // 移除所有选项的高亮
+            for (let i = 0; i < options.length; i++) {
+                options[i].style.backgroundColor = '';
+                options[i].style.backgroundImage = '';
+            }
+            
+            // 检查答案
+            if (Array.from(options).indexOf(option) === correctAnswers[questionNum]) {
+                option.style.background = 'linear-gradient(to right, #d5f5e3, #c1f0d0)';
+                feedback.textContent = getKnowledgeFeedback(questionNum, true);
+                feedback.className = 'quiz-feedback correct';
+            } else {
+                option.style.background = 'linear-gradient(to right, #fadbd8, #f5cac9)';
+                feedback.textContent = getKnowledgeFeedback(questionNum, false);
+                feedback.className = 'quiz-feedback incorrect';
+            }
+            feedback.style.display = 'block';
+        }
+        
+        // 获取知识库问题的反馈
+        function getKnowledgeFeedback(questionNum, isCorrect) {
+            const feedback = {
+                1: {
+                    correct: "✅ 正确！增长因子是底数3，表示每次x增加1，y变为原来的3倍。",
+                    incorrect: "❌ 注意：增长因子是指数函数的底数，不是系数也不是两者的乘积。"
+                },
+                2: {
+                    correct: "✅ 正确！底数越小，衰减越快。0.1ˣ比0.5ˣ和0.9ˣ衰减得更快。",
+                    incorrect: "❌ 再想想：底数越小，函数值下降得越快。"
+                },
+                3: {
+                    correct: "✅ 正确！当x=0时，y=a·b⁰=a·1=a，所以y截距是(0,a)。",
+                    incorrect: "❌ 记住：任何数的0次方都是1，所以当x=0时y=a。"
+                },
+                4: {
+                    correct: "✅ 正确！因为2³=8，所以方程2ˣ=8的解是x=3。",
+                    incorrect: "❌ 注意：2³=8，所以x=3。"
+                },
+                5: {
+                    correct: "✅ 正确！因为3²=9，所以3ˣ<9等价于x<2。",
+                    incorrect: "❌ 提示：3²=9，当x<2时，3ˣ<9。"
+                },
+                6: {
+                    correct: "✅ 正确！因为底数0.5<1，指数越大值越小，所以0.5²=0.25 > 0.125=0.5³。",
+                    incorrect: "❌ 注意：当底数小于1时，指数越大函数值越小。"
+                },
+                7: {
+                    correct: "✅ 正确！4ˣ=(2²)ˣ=2²ˣ，方程变为2²ˣ=2ˣ⁺¹，所以2x=x+1，解得x=1。",
+                    incorrect: "❌ 提示：把4ˣ写成(2²)ˣ=2²ˣ，然后解2²ˣ=2ˣ⁺¹。"
+                },
+                8: {
+                    correct: "✅ 正确！2⁰=1, 2¹=2, 2³=8，所以x=3时y值最大。",
+                    incorrect: "❌ 再想想：指数函数y=2ˣ是增长函数，x越大y越大。"
+                },
+                9: {
+                    correct: "✅ 正确！(1/3)ˣ > (1/3)²，因为底数1/3<1，所以x<2。",
+                    incorrect: "❌ 注意：当底数小于1时，指数函数递减，不等式方向会改变。"
+                },
+                10: {
+                    correct: "✅ 正确！2³=8，3²=9，所以8<9。",
+                    incorrect: "❌ 计算一下：2³=8，3²=9，所以8<9。"
+                }
+            };
+            
+            return isCorrect ? feedback[questionNum].correct : feedback[questionNum].incorrect;
+        }
+        
+        // 初始化游戏
+        window.onload = function() {
+            updateGrowthGraph();
+            updateDecayGraph();
+            updateGameStats();
+            
+            // 生成初始问题
+            generateGrowthQuestion();
+            generateDecayQuestion();
+        };
+    </script>
+</body>
+</html>

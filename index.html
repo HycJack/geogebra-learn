@@ -224,6 +224,66 @@
         // JSON数据源
         const geometryTools = [
         {
+            "name": "弹道轨迹与函数图像教学",
+            "path": "弹道轨迹与函数图像教学.html",
+            "icon": "project-diagram",  // 表示轨迹和关系
+            "description": "弹道轨迹与函数图像教学"
+        },
+        {
+            "name": "笛子分贝与对数函数",
+            "path": "笛子分贝与对数函数.html",
+            "icon": "music",  // 音乐相关
+            "description": "笛子分贝与对数函数"
+        },
+        {
+            "name": "电池衰减闯关游戏",
+            "path": "电池衰减闯关游戏.html",
+            "icon": "battery-three-quarters",  // 电池图标
+            "description": "电池衰减闯关游戏"
+        },
+        {
+            "name": "分数指数幂概念与闯关",
+            "path": "分数指数幂概念与闯关.html",
+            "icon": "superscript",  // 数学幂运算
+            "description": "分数指数幂概念与闯关"
+        },
+        {
+            "name": "根式运算闯关游戏",
+            "path": "根式运算闯关游戏.html",
+            "icon": "square-root-alt",  // 根号符号
+            "description": "根式运算闯关游戏"
+        },
+        {
+            "name": "相似三角形、勾股定理与三角函数",
+            "path": "相似三角形、勾股定理与三角函数.html",
+            "icon": "shapes",  // 三角形
+            "description": "相似三角形、勾股定理与三角函数"
+        },
+        {
+            "name": "一元二次函数闯关游戏",
+            "path": "一元二次函数闯关游戏.html",
+            "icon": "parachute-box",  // 抛物线形状
+            "description": "一元二次函数闯关游戏"
+        },
+        {
+            "name": "匀速圆周运动与正弦三角函数数学演示",
+            "path": "匀速圆周运动与正弦三角函数数学演示.html",
+            "icon": "circle",  // 圆形
+            "description": "匀速圆周运动与正弦三角函数数学演示"
+        },
+        {
+            "name": "指数函数冒险岛",
+            "path": "指数函数冒险岛.html",
+            "icon": "mountain",  // 冒险岛主题
+            "description": "指数函数冒险岛"
+        },
+        {
+            "name": "指数运算演练游戏",
+            "path": "指数运算演练游戏.html",
+            "icon": "calculator",  // 计算器
+            "description": "指数运算演练游戏"
+        },
+        {
                 "name": "四边形性质演示",
                 "path": "四边形性质.html",
                 "icon": "chart-line",
@@ -333,7 +393,7 @@
         
         // 打开文件
         function openFile(path) {
-            
+            window.open(path, '_blank');
             var fullUrl = window.location.href;
  			window.open(fullUrl+"/"+path, '_blank');
         }
