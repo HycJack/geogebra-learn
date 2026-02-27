@@ -155,8 +155,6 @@
     </main>
 
     <script>
-        // 全局变量
-        var ggbApp;
 
 
         // 初始化GeoGebra
@@ -201,10 +199,27 @@
             ggbApp.evalCommand("angle=Angle(A,C,B)");
             ggbApp.evalCommand("ShowLabel(C,true)");
             ggbApp.evalCommand("SetConditionToShowObject(angle,true)");
-            //自动
-            // ggbApp. setAnimating("C",true);
-            // ggbApp. startAnimation();
+            // ---- 创建按钮 -------------------------------------------------
+            // 这里直接用 GeoGebra 命令创建一个按钮对象
+            ggbApp.evalCommand('startButton = Button("开始")');
+            ggbApp.setFixed("startButton", false);
+            ggbApp.evalCommand('stopButton = Button("停止")');
+            ggbApplet.setCorner("stopButton", 100, 100);
+            ggbApp.setFixed("stopButton", false);
+            // ---- 注册点击监听器 -----------------------------------------
+            window.ggbApp.registerObjectClickListener('startButton', function (objName) {
+                console.log('🔘 按钮被点击:', objName);
+                startAnimation()
+            });
+            // ---- 注册点击监听器 -----------------------------------------
+            window.ggbApp.registerObjectClickListener('stopButton', function (objName) {
+                console.log('🔘 按钮被点击:', objName);
+                pauseAnimation()
+            });
 
+            // （可选）在画布下方放一段说明文字
+            ggbApp.evalCommand('Info = Text("点击按钮生成两随机点并连线", (0, -1))');
+            ggbApp.setFixed("Info", false)
         }
 
         function resetView() {
